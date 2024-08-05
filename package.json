@@ -13,7 +13,7 @@
     "@types/node": "^18.15.12",
     "@vueuse/core": "^10.2.0",
     "@vueuse/nuxt": "^10.2.0",
-    "nuxt": "^3.5.2",
+    "nuxt": "^3.12.4",
     "rss": "^1.2.2",
     "sitemap": "^7.1.1",
     "vue-gtag-next": "^1.14.0"
