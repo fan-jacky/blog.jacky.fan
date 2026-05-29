@@ -25,6 +25,12 @@ export default defineNuxtConfig({
             NUXT_PUBLIC_GTAG_ID: process.env.NUXT_PUBLIC_GTAG_ID,
         },
     },
+    runtimeConfig: {
+        // Server-only secrets
+        previewSecret: process.env.PREVIEW_SECRET || '',
+        payloadUrl: process.env.PAYLOAD_URL || 'http://localhost:3001',
+        payloadApiKey: process.env.PAYLOAD_API_KEY || '',
+    },
     googleFonts: {
         families: {
             Roboto: true,

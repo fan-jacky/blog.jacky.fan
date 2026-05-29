@@ -1,0 +1,62 @@
+services:
+  # ── MongoDB ──────────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: blog-cms
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - blog_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Payload CMS ───────────────────────────────────────────────────────────────
+  cms:
+    build:
+      context: ./cms
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - ./cms/.env
+    environment:
+      DATABASE_URI: mongodb://mongodb:27017/blog-cms
+      PORT: "3001"
+    volumes:
+      - cms_uploads:/app/uploads
+    ports:
+      - "3001:3001"
+    networks:
+      - blog_network
+
+  # ── Nuxt Blog ─────────────────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - cms
+    env_file:
+      - .env
+    environment:
+      PAYLOAD_URL: http://cms:3001
+    ports:
+      - "3000:3000"
+    networks:
+      - blog_network
+
+volumes:
+  mongodb_data:
+  cms_uploads:
+
+networks:
+  blog_network:
+    driver: bridge

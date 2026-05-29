@@ -6,3 +6,11 @@ node_modules
 .output
 .env
 dist
+
+# Payload CMS
+cms/uploads/
+cms/dist/
+cms/build/
+cms/node_modules/
+cms/src/payload-types.ts
+cms/src/generated-schema.graphql

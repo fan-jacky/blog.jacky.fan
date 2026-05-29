@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["es2019", "DOM"],
+    "target": "ES2019",
+    "module": "commonjs",
+    "strict": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "build"]
+}
