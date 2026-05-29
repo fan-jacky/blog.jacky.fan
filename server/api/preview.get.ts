@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
     path: '/',
     maxAge: 60 * 60, // 1 hour
     sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
   })
 
   return sendRedirect(event, `/cms-preview/${slug}`)

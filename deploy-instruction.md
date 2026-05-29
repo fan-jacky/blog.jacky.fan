@@ -194,9 +194,13 @@ gunzip -c backup-YYYYMMDD.gz \
 The `cms_uploads` Docker volume contains images uploaded through the CMS. Back it up with:
 
 ```bash
+# Get the full volume name (Docker Compose prefixes with the project name)
+VOLUME=$(docker compose config --format json | python3 -c "import sys,json; print(json.load(sys.stdin)['volumes']['cms_uploads']['name'])" 2>/dev/null \
+  || docker volume ls --filter name=cms_uploads -q | head -1)
+
 docker run --rm \
-  -v blog-cms_cms_uploads:/data \
-  -v $(pwd):/backup \
+  -v "${VOLUME}":/data \
+  -v "$(pwd)":/backup \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz /data
 ```
 

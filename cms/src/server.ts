@@ -1,8 +1,9 @@
 import express from 'express'
 import payload from 'payload'
 import path from 'path'
+import dotenv from 'dotenv'
 
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 if (!process.env.PAYLOAD_SECRET) {
   throw new Error('PAYLOAD_SECRET environment variable is required but not set.')
