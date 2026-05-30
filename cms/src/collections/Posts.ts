@@ -6,11 +6,8 @@ const Posts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'status', 'publishedDate'],
     preview: (doc) => {
-      const siteURL =
-        process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000'
-      const previewSecret = process.env.PREVIEW_SECRET || ''
-      if (doc?.slug) {
-        return `${siteURL}/api/preview?secret=${previewSecret}&slug=${doc.slug}`
+      if (typeof doc?.slug === 'string') {
+        return `/preview/${encodeURIComponent(doc.slug)}`
       }
       return null
     },

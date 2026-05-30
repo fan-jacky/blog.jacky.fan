@@ -1,4 +1,5 @@
 import path from 'path'
+import dotenv from 'dotenv'
 import { buildConfig } from 'payload/config'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { webpackBundler } from '@payloadcms/bundler-webpack'
@@ -6,6 +7,8 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',

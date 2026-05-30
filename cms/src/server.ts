@@ -16,6 +16,23 @@ app.get('/', (_, res) => {
   res.redirect('/admin')
 })
 
+app.get('/preview/:slug', (req, res) => {
+  const siteURL = process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const previewSecret = process.env.PREVIEW_SECRET || ''
+  const { slug } = req.params
+
+  if (!previewSecret) {
+    return res.status(500).send('PREVIEW_SECRET is not configured.')
+  }
+
+  const params = new URLSearchParams({
+    secret: previewSecret,
+    slug,
+  })
+
+  res.redirect(`${siteURL}/api/preview?${params.toString()}`)
+})
+
 const start = async (): Promise<void> => {
   await payload.init({
     secret: process.env.PAYLOAD_SECRET as string,
