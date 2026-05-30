@@ -1,5 +1,5 @@
 import path from 'path'
-import { CollectionConfig } from 'payload/types'
+import type { CollectionConfig } from 'payload/types'
 
 const Media: CollectionConfig = {
   slug: 'media',

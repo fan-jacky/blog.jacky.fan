@@ -5,6 +5,7 @@
  * links, and inline marks (bold, italic, underline, strikethrough, code).
  */
 import type { SlateLeaf, SlateNode } from '~/types/slate'
+import { createHeadingId, extractTextFromSlate } from '~/utils/payloadPost'
 
 const props = defineProps<{
   nodes: SlateNode[]
@@ -30,10 +31,12 @@ function serializeLeaf(leaf: SlateLeaf): string {
 }
 
 function serializeChildren(children: Array<SlateNode | SlateLeaf> = []): string {
+  const headingIds = new Map<string, number>()
+
   return children
     .map((child) => {
       if (isLeaf(child)) return serializeLeaf(child)
-      return serializeNode(child)
+      return serializeNode(child, headingIds)
     })
     .join('')
 }
@@ -53,22 +56,20 @@ function sanitizeURL(url: string | undefined): string {
   return '#'
 }
 
-function serializeNode(node: SlateNode): string {
+function serializeNode(node: SlateNode, headingIds: Map<string, number>): string {
   const inner = serializeChildren(node.children)
 
   switch (node.type) {
     case 'h1':
-      return `<h1>${inner}</h1>`
     case 'h2':
-      return `<h2>${inner}</h2>`
     case 'h3':
-      return `<h3>${inner}</h3>`
     case 'h4':
-      return `<h4>${inner}</h4>`
     case 'h5':
-      return `<h5>${inner}</h5>`
-    case 'h6':
-      return `<h6>${inner}</h6>`
+    case 'h6': {
+      const headingText = extractTextFromSlate(node.children ?? [])
+      const headingId = createHeadingId(headingText, headingIds)
+      return `<${node.type} id="${headingId}">${inner}</${node.type}>`
+    }
     case 'ul':
       return `<ul>${inner}</ul>`
     case 'ol':
@@ -92,9 +93,11 @@ function serializeNode(node: SlateNode): string {
   }
 }
 
-const html = computed(() =>
-  (props.nodes ?? []).map((n) => serializeNode(n)).join('')
-)
+const html = computed(() => {
+  const headingIds = new Map<string, number>()
+
+  return (props.nodes ?? []).map((node) => serializeNode(node, headingIds)).join('')
+})
 </script>
 
 <template>

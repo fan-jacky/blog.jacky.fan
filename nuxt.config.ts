@@ -1,5 +1,9 @@
+import { fileURLToPath } from "node:url";
+
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+    workspaceDir: fileURLToPath(new URL(".", import.meta.url)),
+    ignore: ["cms", "cms/**"],
     app: {
         pageTransition: { name: "page", mode: "out-in" },
         head: {

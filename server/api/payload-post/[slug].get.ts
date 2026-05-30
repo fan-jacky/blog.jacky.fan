@@ -1,41 +1,20 @@
+import { fetchPayloadPostBySlug } from '~/server/utils/payload'
+
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')
-  const cookies = parseCookies(event)
-  const isPreview = !!cookies['payload-preview']
 
   if (!slug) {
     throw createError({ statusCode: 400, statusMessage: 'Missing slug parameter' })
   }
 
-  const config = useRuntimeConfig()
-  const payloadURL = config.payloadUrl
-  const apiKey = config.payloadApiKey
-
-  if (!payloadURL) {
-    throw createError({ statusCode: 500, statusMessage: 'CMS URL is not configured' })
-  }
-
   try {
-    const response = await $fetch<{ docs: unknown[] }>(
-      `${payloadURL}/api/posts`,
-      {
-        params: {
-          'where[slug][equals]': slug,
-          draft: isPreview ? 'true' : 'false',
-          depth: 1,
-          limit: 1,
-        },
-        headers: apiKey
-          ? { Authorization: `users API-Key ${apiKey}` }
-          : {},
-      }
-    )
+    const post = await fetchPayloadPostBySlug(event, slug)
 
-    if (!response.docs || response.docs.length === 0) {
+    if (!post) {
       throw createError({ statusCode: 404, statusMessage: 'Post not found in CMS' })
     }
 
-    return response.docs[0]
+    return post
   } catch (error: unknown) {
     const err = error as { statusCode?: number; statusMessage?: string; message?: string }
     if (err?.statusCode === 404) throw error

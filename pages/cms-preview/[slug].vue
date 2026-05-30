@@ -65,6 +65,9 @@ const estimatedReadTime = computed(() => {
   const wordCount = text.split(/\s+/).filter(Boolean).length
   return Math.max(1, Math.ceil(wordCount / 250))
 })
+
+const contentNodes = computed(() => post.value?.content ?? [])
+const hasContent = computed(() => contentNodes.value.length > 0)
 </script>
 
 <template>
@@ -122,8 +125,8 @@ const estimatedReadTime = computed(() => {
 
               <!-- Rich text content rendered from Payload Slate JSON -->
               <ContentSlateRenderer
-                v-if="Array.isArray(post.content) && post.content.length"
-                :nodes="post.content"
+                v-if="hasContent"
+                :nodes="contentNodes"
               />
               <p v-else class="text-base-content/50 italic">
                 No content yet.
