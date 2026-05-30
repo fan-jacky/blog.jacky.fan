@@ -1,17 +1,41 @@
 {
   "compilerOptions": {
-    "lib": ["es2019", "DOM"],
-    "target": "ES2019",
-    "module": "commonjs",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "allowJs": true,
+    "target": "ES2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "strict": false,
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "noEmit": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "sourceMap": true
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@payload-config": [
+        "./src/payload.config.ts"
+      ]
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

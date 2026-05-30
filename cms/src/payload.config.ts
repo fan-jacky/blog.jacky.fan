@@ -1,24 +1,32 @@
-import path from 'path'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import dotenv from 'dotenv'
-import { buildConfig } from 'payload/config'
+import sharp from 'sharp'
+import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { webpackBundler } from '@payloadcms/bundler-webpack'
 import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+
+dotenv.config({ path: path.resolve(dirname, '../.env') })
 
 export default buildConfig({
+  secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: Users.slug,
-    bundler: webpackBundler(),
     meta: {
       titleSuffix: '— Blog CMS',
-      favicon: '/favicon.ico',
-      ogImage: '/og-image.jpg',
+      icons: {
+        icon: '/favicon.ico',
+      },
+      openGraph: {
+        images: [{ url: '/og-image.jpg' }],
+      },
     },
   },
   editor: slateEditor({}),
@@ -26,11 +34,12 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || 'mongodb://localhost:27017/blog-cms',
   }),
+  sharp,
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+    outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   graphQL: {
-    schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
+    schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
   },
   cors: [
     process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000',

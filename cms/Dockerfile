@@ -4,7 +4,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install dependencies (including devDependencies needed for the build)
-COPY package.json ./
+COPY package.json tsconfig.json next.config.ts next-env.d.ts ./
+COPY src ./src
 RUN npm install --legacy-peer-deps
 
 # Copy source and build
@@ -16,14 +17,14 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
+ENV PORT=3001
 
-# Copy only what is needed to run the server
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/build ./build
+# Copy only what is needed to run the app
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/next.config.ts ./
 
 EXPOSE 3001
 
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start"]

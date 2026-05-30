@@ -1,0 +1,7 @@
+node_modules
+.next
+uploads
+dist
+build
+npm-debug.log*
+pnpm-debug.log*
