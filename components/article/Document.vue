@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PayloadPost } from '~/types/payload'
+import SlateRenderer from '~/components/content/SlateRenderer.vue'
 import { estimateReadTime, formatPayloadDate } from '~/utils/payloadPost'
 
 const props = defineProps<{
@@ -42,7 +43,7 @@ const hasContent = computed(() => contentNodes.value.length > 0)
                 &nbsp;|&nbsp;
                 <IconsClock class="w-auto h-[1.2em] mb-1 mr-1 inline" />{{ readTime }} min read
             </small>
-            <ContentSlateRenderer
+            <SlateRenderer
                 v-if="hasContent"
                 :nodes="contentNodes"
             />

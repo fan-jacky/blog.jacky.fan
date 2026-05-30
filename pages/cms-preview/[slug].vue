@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SlateNode, SlateLeaf } from '~/types/slate'
+import SlateRenderer from '~/components/content/SlateRenderer.vue'
 
 function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): string {
   return nodes
@@ -124,7 +125,7 @@ const hasContent = computed(() => contentNodes.value.length > 0)
               </small>
 
               <!-- Rich text content rendered from Payload Slate JSON -->
-              <ContentSlateRenderer
+              <SlateRenderer
                 v-if="hasContent"
                 :nodes="contentNodes"
               />

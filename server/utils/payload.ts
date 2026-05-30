@@ -70,9 +70,12 @@ export async function fetchPayloadPosts(
 }
 
 export async function fetchPayloadPostBySlug(event: H3Event, slug: string) {
+  const isPreview = isPayloadPreviewRequest(event)
+
   const [post] = await fetchPayloadPosts(event, {
     depth: 1,
-    draft: isPayloadPreviewRequest(event),
+    draft: isPreview,
+    onlyPublished: !isPreview,
     slug,
   })
 
