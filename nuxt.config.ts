@@ -1,5 +1,9 @@
+import { fileURLToPath } from "node:url";
+
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+    workspaceDir: fileURLToPath(new URL(".", import.meta.url)),
+    ignore: ["cms", "cms/**"],
     app: {
         pageTransition: { name: "page", mode: "out-in" },
         head: {
@@ -24,6 +28,12 @@ export default defineNuxtConfig({
         public: {
             NUXT_PUBLIC_GTAG_ID: process.env.NUXT_PUBLIC_GTAG_ID,
         },
+    },
+    runtimeConfig: {
+        // Server-only secrets
+        previewSecret: process.env.PREVIEW_SECRET || '',
+        payloadUrl: process.env.PAYLOAD_URL || 'http://localhost:3001',
+        payloadApiKey: process.env.PAYLOAD_API_KEY || '',
     },
     googleFonts: {
         families: {

@@ -1,14 +1,14 @@
 import RSS from 'rss';  // this package does not have type
+import { fetchPayloadPosts } from '~/server/utils/payload'
 
 export default defineEventHandler(async (event) => {
 
     const domain = "blog.jacky.fan"
-    
-    let response = await fetch(`https://${domain}/api/_content/query`, {method: "GET"})
-    let responseJSON = await response.json()
-
-    // sort by created_date desc
-    responseJSON = responseJSON.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime())
+    const posts = await fetchPayloadPosts(event, {
+        depth: 0,
+        draft: false,
+        onlyPublished: true,
+    })
 
     const data = await new Promise(async (resolve, reject) => {
         try {
@@ -18,13 +18,13 @@ export default defineEventHandler(async (event) => {
                 feed_url: `https://${domain}/rss.xml`
             })
 
-            for (const doc of responseJSON) {
+            for (const post of posts) {
                 feed.item({
-                    title: doc.title ?? '-',
-                    url: `https://${domain}${doc._path}`,
-                    date: doc.created_date,
-                    pubDate: doc.created_date,
-                    description: doc.description
+                    title: post.title ?? '-',
+                    url: `https://${domain}/articles/${post.slug}`,
+                    date: post.publishedDate,
+                    pubDate: post.publishedDate,
+                    description: post.description
                 })
             }
 

@@ -1,44 +1,38 @@
-<script lang="ts">
-export default {
-  setup: async function () {
-    useHead({
-      title: "Jacky FAN's Blog - A Personal Blog by Jacky FAN",
-      meta: [
-        {
-          name: "description",
-          content: "Welcome to Jacky FAN's Blog, where I share my passion for all the things I love, including programming, technology and so on.",
-        },
-        {
-          name: "keywords",
-          content: "Jacky FAN, Blog, Personal Blog, Jacky FAN's Blog",
-        },
-      ],
-    })
-    const { data, pending, error, refresh } = await useAsyncData("articles", async () => {
-      const articles = await queryContent("articles").sort({ created_date: -1 }).find()
-      return { articles: articles }
-    });
-    return { data }
-  },
-  data() {
-    return {
-      skipArticles: 0,
-      page: 1,
-    }
-  },
-  methods: {
-    setPage: function (page: number) {
-      this.page = page;
-      this.skipArticles = 5 * (page - 1);
-    },
-    getPageTotal: function (articleLength: number): number {
-      let total = Math.trunc(articleLength / 5);
-      if ((articleLength % 5) > 0) total++;
-      return total;
-    }
-  }
-}
+<script setup lang="ts">
+import type { PayloadPostSummary } from '~/types/payload'
+import { buildArticlePath, formatPayloadDate } from '~/utils/payloadPost'
 
+useHead({
+  title: "Jacky FAN's Blog - A Personal Blog by Jacky FAN",
+  meta: [
+    {
+      name: 'description',
+      content: "Welcome to Jacky FAN's Blog, where I share my passion for all the things I love, including programming, technology and so on.",
+    },
+    {
+      name: 'keywords',
+      content: "Jacky FAN, Blog, Personal Blog, Jacky FAN's Blog",
+    },
+  ],
+})
+
+const page = ref(1)
+const pageSize = 5
+
+const { data: articles } = await useFetch<PayloadPostSummary[]>('/api/payload-posts', {
+  key: 'homepage-articles',
+})
+
+const totalPages = computed(() => Math.ceil((articles.value?.length ?? 0) / pageSize))
+
+const paginatedArticles = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return (articles.value ?? []).slice(start, start + pageSize)
+})
+
+function setPage(nextPage: number) {
+  page.value = nextPage
+}
 </script>
 
 <template>
@@ -56,30 +50,25 @@ export default {
             <!-- for SEO -->
             <h1 class="hidden">Jacky FAN's Blog</h1>
 
-            <div v-for="(article, index) in data?.articles">
-              <div v-if="index < skipArticles + 5 && index >= skipArticles">
-                <div class="bg-base-100 rounded-3xl shadow-md my-4 px-8 py-12">
-                  <article class="prose prose-slate w-full inline">
-                    <h2 class="mb-0 text-2xl">
-                      <NuxtLink :to="`${article._path}`" class="no-underline hover:text-blue-500 transition-all">
-                        {{ article.title }}
-                      </NuxtLink>
-                    </h2>
-                    <small>
-                      <IconsDateIcon className="h-[1rem] mb-1 mr-1 inline" />{{ new
-                        Date(article.created_date).toDateString() }}
-                    </small>
-                    <p> {{ article.description }} </p>
-                  </article>
-                </div>
-              </div>
+            <div v-for="article in paginatedArticles" :key="article.id" class="bg-base-100 rounded-3xl shadow-md my-4 px-8 py-12">
+              <article class="prose prose-slate w-full inline">
+                <h2 class="mb-0 text-2xl">
+                  <NuxtLink :to="buildArticlePath(article.slug)" class="no-underline hover:text-blue-500 transition-all">
+                    {{ article.title }}
+                  </NuxtLink>
+                </h2>
+                <small v-if="article.publishedDate">
+                  <IconsDateIcon className="h-[1rem] mb-1 mr-1 inline" />{{ formatPayloadDate(article.publishedDate) }}
+                </small>
+                <p>{{ article.description }}</p>
+              </article>
             </div>
           </div>
-          <div class="my-4 px-8 pt-12 lg:pb-4 text-center">
+          <div v-if="totalPages > 1" class="my-4 px-8 pt-12 lg:pb-4 text-center">
             <div class="join">
               <input class="join-item btn btn-square" type="radio" name="options" :aria-label="(n).toString()"
-                @click="() => { setPage(n) }" :checked="n === page"
-                v-for="n in getPageTotal(data?.articles.length ?? 0)" />
+                @click="setPage(n)" :checked="n === page"
+                v-for="n in totalPages" :key="n" />
             </div>
           </div>
         </div>

@@ -1,16 +1,25 @@
-import { serverQueryContent } from '#content/server'
 import { SitemapStream, streamToPromise } from 'sitemap'
+import { fetchPayloadPosts } from '~/server/utils/payload'
 
 export default defineEventHandler(async (event) => {
-  // Fetch all documents
-  const docs = await serverQueryContent(event).find()
+  const posts = await fetchPayloadPosts(event, {
+    depth: 0,
+    draft: false,
+    onlyPublished: true,
+  })
+
   const sitemap = new SitemapStream({
       hostname: "https://blog.jacky.fan",
   });
 
-  for (const doc of docs) {
+  sitemap.write({
+    url: '/',
+    changefreq: 'weekly',
+  })
+
+  for (const post of posts) {
     sitemap.write({
-      url: doc._path,
+      url: `/articles/${post.slug}`,
       changefreq: 'monthly'
     })
   }
