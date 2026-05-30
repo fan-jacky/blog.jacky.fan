@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         // Server-only secrets
         previewSecret: process.env.PREVIEW_SECRET || '',
-        payloadUrl: process.env.PAYLOAD_URL || 'http://localhost:3001',
+        payloadUrl: process.env.NUXT_PAYLOAD_URL || process.env.PAYLOAD_URL || 'http://localhost:3001',
         payloadApiKey: process.env.PAYLOAD_API_KEY || '',
     },
     googleFonts: {

@@ -49,6 +49,7 @@ services:
     env_file:
       - .env
     environment:
+      NUXT_PAYLOAD_URL: http://cms:3001
       PAYLOAD_URL: http://cms:3001
     ports:
       - "3000:3000"
