@@ -16,6 +16,12 @@ export interface SlateNode {
   children?: Array<SlateNode | SlateLeaf>
   url?: string
   newTab?: boolean
+  relationTo?: string
+  value?: {
+    alt?: string | null
+    url?: string | null
+    filename?: string | null
+  } | string | null
   // Leaf properties (for inline nodes)
   text?: string
   bold?: boolean

@@ -11,6 +11,8 @@ const props = defineProps<{
   nodes: SlateNode[]
 }>()
 
+const config = useRuntimeConfig()
+
 function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
 }
@@ -56,6 +58,48 @@ function sanitizeURL(url: string | undefined): string {
   return '#'
 }
 
+function resolveMediaURL(url: string | undefined | null): string {
+  if (!url) return ''
+
+  try {
+    return new URL(url).toString()
+  } catch {
+    const base = config.public.payloadUrl || config.payloadUrl
+
+    if (!base) {
+      return url
+    }
+
+    try {
+      return new URL(url, base).toString()
+    } catch {
+      return url
+    }
+  }
+}
+
+function escapeAttribute(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function serializeUpload(node: SlateNode): string {
+  const media = typeof node.value === 'object' && node.value !== null ? node.value : null
+  const src = resolveMediaURL(media?.url)
+
+  if (!src) {
+    return ''
+  }
+
+  const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
+  const caption = media?.alt?.trim()
+
+  return `<figure><img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" loading="lazy" />${caption ? `<figcaption>${escapeAttribute(caption)}</figcaption>` : ''}</figure>`
+}
+
 function serializeNode(node: SlateNode, headingIds: Map<string, number>): string {
   const inner = serializeChildren(node.children)
 
@@ -86,7 +130,7 @@ function serializeNode(node: SlateNode, headingIds: Map<string, number>): string
       return `<a href="${href}"${target}>${inner}</a>`
     }
     case 'upload':
-      return '' // uploaded media within content not rendered here
+      return serializeUpload(node)
     default:
       // paragraph or unknown — fall back to <p>
       return inner ? `<p>${inner}</p>` : ''
