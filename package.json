@@ -19,6 +19,7 @@
     "vue-gtag-next": "^1.14.0"
   },
   "dependencies": {
+    "@payloadcms/live-preview-vue": "^3.85.0",
     "@tailwindcss/typography": "^0.5.9",
     "daisyui": "^3.1.0"
   }

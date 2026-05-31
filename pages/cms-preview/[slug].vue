@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { SlateNode, SlateLeaf } from '~/types/slate'
+import type { PayloadPost } from '~/types/payload'
+import { useLivePreview } from '@payloadcms/live-preview-vue'
 import SlateRenderer from '~/components/content/SlateRenderer.vue'
 
 function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): string {
@@ -14,26 +16,11 @@ function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): string 
     .join(' ')
 }
 
-interface PayloadPost {
-  id: string
-  title: string
-  slug: string
-  description?: string
-  content?: SlateNode[]
-  author?: string
-  publishedDate?: string
-  tags?: string
-  status: 'draft' | 'published'
-  featuredImage?: {
-    url: string
-    alt?: string
-  }
-}
-
 const route = useRoute()
 const slug = route.params.slug as string
+const config = useRuntimeConfig()
 
-const { data: post, error } = await useFetch<PayloadPost>(
+const { data: fetchedPost, error } = await useFetch<PayloadPost>(
   `/api/payload-post/${encodeURIComponent(slug)}`
 )
 
@@ -45,7 +32,14 @@ if (error.value) {
   })
 }
 
-useHead({
+const initialPost = fetchedPost.value as PayloadPost
+const { data: post } = useLivePreview<PayloadPost>({
+  initialData: initialPost,
+  serverURL: config.public.payloadUrl,
+  depth: 1,
+})
+
+useHead(() => ({
   title: post.value?.title ?? 'Preview',
   meta: [
     { name: 'robots', content: 'noindex,nofollow' },
@@ -53,7 +47,7 @@ useHead({
       ? [{ name: 'description', content: post.value.description }]
       : []),
   ],
-})
+}))
 
 const formattedDate = computed(() => {
   const d = post.value?.publishedDate

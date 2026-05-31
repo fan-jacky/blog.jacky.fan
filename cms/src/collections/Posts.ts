@@ -5,6 +5,27 @@ const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'status', 'publishedDate'],
+    livePreview: {
+      url: ({ data, req }) => {
+        if (typeof data?.slug !== 'string' || !data.slug.trim()) {
+          return null
+        }
+
+        const siteURL = process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000'
+        const previewSecret = process.env.PREVIEW_SECRET || ''
+
+        if (!previewSecret) {
+          req.payload.logger.warn('Posts live preview is disabled because PREVIEW_SECRET is not configured.')
+          return null
+        }
+
+        const previewURL = new URL('/api/preview', siteURL)
+        previewURL.searchParams.set('secret', previewSecret)
+        previewURL.searchParams.set('slug', data.slug)
+
+        return previewURL.toString()
+      },
+    },
     preview: (doc) => {
       if (typeof doc?.slug === 'string') {
         return `/preview/${encodeURIComponent(doc.slug)}`

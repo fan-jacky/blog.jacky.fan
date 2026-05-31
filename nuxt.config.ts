@@ -34,6 +34,9 @@ export default defineNuxtConfig({
         previewSecret: process.env.PREVIEW_SECRET || '',
         payloadUrl: process.env.NUXT_PAYLOAD_URL || process.env.PAYLOAD_URL || 'http://localhost:3001',
         payloadApiKey: process.env.PAYLOAD_API_KEY || '',
+        public: {
+            payloadUrl: process.env.NUXT_PAYLOAD_URL || process.env.PAYLOAD_URL || 'http://localhost:3001',
+        },
     },
     googleFonts: {
         families: {
