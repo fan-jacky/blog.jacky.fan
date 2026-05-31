@@ -8,7 +8,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     ports:
-      - "27017:27017"
+      - "27027:27017"
     networks:
       - blog_network
     healthcheck:
@@ -34,7 +34,7 @@ services:
     volumes:
       - cms_uploads:/app/uploads
     ports:
-      - "3001:3001"
+      - "4101:3001"
     networks:
       - blog_network
 
@@ -52,7 +52,7 @@ services:
       NUXT_PAYLOAD_URL: http://cms:3001
       PAYLOAD_URL: http://cms:3001
     ports:
-      - "3000:3000"
+      - "4100:3000"
     networks:
       - blog_network
 
