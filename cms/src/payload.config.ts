@@ -8,6 +8,7 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
+import { codeBlock } from './editor/slate/codeBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -29,7 +30,28 @@ export default buildConfig({
       },
     },
   },
-  editor: slateEditor({}),
+  editor: slateEditor({
+    admin: {
+      elements: [
+        'blockquote',
+        codeBlock,
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'indent',
+        'li',
+        'link',
+        'ol',
+        'relationship',
+        'textAlign',
+        'ul',
+        'upload',
+      ],
+    },
+  }),
   collections: [Posts, Media, Users],
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || 'mongodb://localhost:27017/blog-cms',

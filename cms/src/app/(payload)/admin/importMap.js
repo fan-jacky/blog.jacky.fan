@@ -41,6 +41,8 @@ import { UnorderedListElement as UnorderedListElement_0b388c087d9de8c4f011dd323a
 import { UploadElementButton as UploadElementButton_0b388c087d9de8c4f011dd323a130cfb } from '@payloadcms/richtext-slate/client'
 import { UploadElement as UploadElement_0b388c087d9de8c4f011dd323a130cfb } from '@payloadcms/richtext-slate/client'
 import { WithUpload as WithUpload_0b388c087d9de8c4f011dd323a130cfb } from '@payloadcms/richtext-slate/client'
+import { CodeBlockButton as CodeBlockButton_16d7d3df4e30c6d99bee06c647363fde } from '../../../../src/editor/slate/CodeBlockButton.tsx'
+import { CodeBlockElement as CodeBlockElement_a68a8fc38e012ccc12c2b4ec8f10762b } from '../../../../src/editor/slate/CodeBlockElement.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -88,5 +90,7 @@ export const importMap = {
   "@payloadcms/richtext-slate/client#UploadElementButton": UploadElementButton_0b388c087d9de8c4f011dd323a130cfb,
   "@payloadcms/richtext-slate/client#UploadElement": UploadElement_0b388c087d9de8c4f011dd323a130cfb,
   "@payloadcms/richtext-slate/client#WithUpload": WithUpload_0b388c087d9de8c4f011dd323a130cfb,
+  "/src/editor/slate/CodeBlockButton.tsx#CodeBlockButton": CodeBlockButton_16d7d3df4e30c6d99bee06c647363fde,
+  "/src/editor/slate/CodeBlockElement.tsx#CodeBlockElement": CodeBlockElement_a68a8fc38e012ccc12c2b4ec8f10762b,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

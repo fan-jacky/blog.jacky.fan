@@ -1,9 +1,7 @@
 <script setup lang="ts">
-/**
- * Renders Payload CMS Slate rich text JSON into HTML.
- * Handles common block types: headings, paragraphs, lists, blockquotes, code,
- * links, and inline marks (bold, italic, underline, strikethrough, code).
- */
+import { defineComponent, h } from 'vue'
+import type { VNodeChild } from 'vue'
+import ProseCode from '~/components/content/ProseCode.vue'
 import type { SlateLeaf, SlateNode } from '~/types/slate'
 import { createHeadingId, extractTextFromSlate } from '~/utils/payloadPost'
 
@@ -17,30 +15,29 @@ function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
 }
 
-function serializeLeaf(leaf: SlateLeaf): string {
-  let text = leaf.text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+function renderLeaf(leaf: SlateLeaf): VNodeChild {
+  let content: VNodeChild = leaf.text
 
-  if (leaf.bold) text = `<strong>${text}</strong>`
-  if (leaf.italic) text = `<em>${text}</em>`
-  if (leaf.underline) text = `<u>${text}</u>`
-  if (leaf.strikethrough) text = `<s>${text}</s>`
-  if (leaf.code) text = `<code class="bg-base-300 rounded px-1 text-sm">${text}</code>`
+  if (leaf.bold) content = h('strong', content)
+  if (leaf.italic) content = h('em', content)
+  if (leaf.underline) content = h('u', content)
+  if (leaf.strikethrough) content = h('s', content)
+  if (leaf.code) content = h('code', { class: 'bg-base-300 rounded px-1 text-sm' }, content)
 
-  return text
+  return content
 }
 
-function serializeChildren(children: Array<SlateNode | SlateLeaf> = []): string {
-  const headingIds = new Map<string, number>()
+function renderChildren(
+  children: Array<SlateNode | SlateLeaf> = [],
+  headingIds: Map<string, number>,
+): VNodeChild[] {
+  return children.map((child, index) => {
+    if (isLeaf(child)) {
+      return renderLeaf(child)
+    }
 
-  return children
-    .map((child) => {
-      if (isLeaf(child)) return serializeLeaf(child)
-      return serializeNode(child, headingIds)
-    })
-    .join('')
+    return renderNode(child, headingIds, index)
+  })
 }
 
 function sanitizeURL(url: string | undefined): string {
@@ -78,30 +75,41 @@ function resolveMediaURL(url: string | undefined | null): string {
   }
 }
 
-function escapeAttribute(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
+  return children
+    .map((child) => {
+      if (isLeaf(child)) {
+        return child.text
+      }
+
+      return extractCodeText(child.children ?? [])
+    })
+    .join('')
 }
 
-function serializeUpload(node: SlateNode): string {
+function renderUpload(node: SlateNode): VNodeChild | null {
   const media = typeof node.value === 'object' && node.value !== null ? node.value : null
   const src = resolveMediaURL(media?.url)
 
   if (!src) {
-    return ''
+    return null
   }
 
   const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
   const caption = media?.alt?.trim()
 
-  return `<figure><img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" loading="lazy" />${caption ? `<figcaption>${escapeAttribute(caption)}</figcaption>` : ''}</figure>`
+  return h('figure', [
+    h('img', { alt, loading: 'lazy', src }),
+    caption ? h('figcaption', caption) : null,
+  ])
 }
 
-function serializeNode(node: SlateNode, headingIds: Map<string, number>): string {
-  const inner = serializeChildren(node.children)
+function renderNode(
+  node: SlateNode,
+  headingIds: Map<string, number>,
+  key?: number | string,
+): VNodeChild | null {
+  const children = renderChildren(node.children ?? [], headingIds)
 
   switch (node.type) {
     case 'h1':
@@ -112,39 +120,62 @@ function serializeNode(node: SlateNode, headingIds: Map<string, number>): string
     case 'h6': {
       const headingText = extractTextFromSlate(node.children ?? [])
       const headingId = createHeadingId(headingText, headingIds)
-      return `<${node.type} id="${headingId}">${inner}</${node.type}>`
+      return h(node.type, { id: headingId, key }, children)
     }
     case 'ul':
-      return `<ul>${inner}</ul>`
+      return h('ul', { key }, children)
     case 'ol':
-      return `<ol>${inner}</ol>`
+      return h('ol', { key }, children)
     case 'li':
-      return `<li>${inner}</li>`
+      return h('li', { key }, children)
     case 'blockquote':
-      return `<blockquote>${inner}</blockquote>`
-    case 'code':
-      return `<pre><code>${inner}</code></pre>`
+      return h('blockquote', { key }, children)
+    case 'code': {
+      const code = extractCodeText(node.children ?? [])
+
+      return h(
+        ProseCode,
+        { code, key },
+        {
+          default: () => [h('pre', [h('code', code)])],
+        },
+      )
+    }
     case 'link': {
       const href = sanitizeURL(node.url)
-      const target = node.newTab ? ' target="_blank" rel="noopener noreferrer"' : ''
-      return `<a href="${href}"${target}>${inner}</a>`
+      return h(
+        'a',
+        {
+          href,
+          key,
+          ...(node.newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}),
+        },
+        children,
+      )
     }
     case 'upload':
-      return serializeUpload(node)
+      return renderUpload(node)
     default:
-      // paragraph or unknown — fall back to <p>
-      return inner ? `<p>${inner}</p>` : ''
+      return children.length > 0 ? h('p', { key }, children) : null
   }
 }
 
-const html = computed(() => {
+const renderedNodes = computed(() => {
   const headingIds = new Map<string, number>()
 
-  return (props.nodes ?? []).map((node) => serializeNode(node, headingIds)).join('')
+  return (props.nodes ?? []).map((node, index) => renderNode(node, headingIds, index)).filter(Boolean)
+})
+
+const RenderedSlate = defineComponent({
+  name: 'RenderedSlate',
+  setup() {
+    return () => renderedNodes.value
+  },
 })
 </script>
 
 <template>
-  <!-- eslint-disable-next-line vue/no-v-html -->
-  <div class="prose prose-slate w-full" v-html="html" />
+  <div class="prose prose-slate w-full">
+    <RenderedSlate />
+  </div>
 </template>
