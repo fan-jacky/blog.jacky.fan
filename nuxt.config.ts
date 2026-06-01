@@ -1,5 +1,15 @@
 import { fileURLToPath } from "node:url";
 
+const internalPayloadUrl =
+    process.env.NUXT_PAYLOAD_URL ||
+    process.env.PAYLOAD_URL ||
+    'http://localhost:3001'
+
+const publicPayloadUrl =
+    process.env.NUXT_PUBLIC_PAYLOAD_URL ||
+    process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+    internalPayloadUrl
+
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
     workspaceDir: fileURLToPath(new URL(".", import.meta.url)),
@@ -32,10 +42,10 @@ export default defineNuxtConfig({
     runtimeConfig: {
         // Server-only secrets
         previewSecret: process.env.PREVIEW_SECRET || '',
-        payloadUrl: process.env.NUXT_PAYLOAD_URL || process.env.PAYLOAD_URL || 'http://localhost:3001',
+        payloadUrl: internalPayloadUrl,
         payloadApiKey: process.env.PAYLOAD_API_KEY || '',
         public: {
-            payloadUrl: process.env.NUXT_PAYLOAD_URL || process.env.PAYLOAD_URL || 'http://localhost:3001',
+            payloadUrl: publicPayloadUrl,
         },
     },
     googleFonts: {

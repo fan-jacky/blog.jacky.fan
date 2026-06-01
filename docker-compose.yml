@@ -51,6 +51,7 @@ services:
     environment:
       NUXT_PAYLOAD_URL: http://cms:3001
       PAYLOAD_URL: http://cms:3001
+      NUXT_PUBLIC_PAYLOAD_URL: http://localhost:4101
     ports:
       - "4100:3000"
     networks:
