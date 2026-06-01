@@ -45,7 +45,7 @@ Edit `.env` and fill in:
 |-------------------|-----------------------------------------------------------------------------|
 | `PREVIEW_SECRET`  | A random string shared with the CMS to authenticate preview requests        |
 | `PAYLOAD_URL`     | Internal Docker network URL for the CMS (leave as `http://cms:3001`)        |
-| `NUXT_PUBLIC_PAYLOAD_URL` | Public URL where the CMS is reachable from the browser, e.g. `http://localhost:4101` |
+| `NUXT_PUBLIC_PAYLOAD_URL` | Public URL where the CMS is reachable from the browser. This must exactly match the CMS origin, including `https://` when applicable. |
 | `PAYLOAD_API_KEY` | API key generated from a CMS user (see step 4)                              |
 | `NUXT_PUBLIC_GTAG_ID` | (Optional) Google Analytics measurement ID                             |
 

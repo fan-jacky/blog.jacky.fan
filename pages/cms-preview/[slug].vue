@@ -20,6 +20,32 @@ const route = useRoute()
 const slug = route.params.slug as string
 const config = useRuntimeConfig()
 
+function normalizeOrigin(value: string | undefined) {
+  if (!value) {
+    return ''
+  }
+
+  try {
+    return new URL(value).origin
+  } catch {
+    return ''
+  }
+}
+
+function resolveLivePreviewServerURL() {
+  if (import.meta.client) {
+    const referrerOrigin = normalizeOrigin(document.referrer)
+
+    if (referrerOrigin) {
+      return referrerOrigin
+    }
+  }
+
+  return normalizeOrigin(config.public.payloadUrl) || normalizeOrigin(config.payloadUrl)
+}
+
+const livePreviewServerURL = resolveLivePreviewServerURL()
+
 const { data: fetchedPost, error } = await useFetch<PayloadPost>(
   `/api/payload-post/${encodeURIComponent(slug)}`
 )
@@ -35,7 +61,7 @@ if (error.value) {
 const initialPost = fetchedPost.value as PayloadPost
 const { data: post } = useLivePreview<PayloadPost>({
   initialData: initialPost,
-  serverURL: config.public.payloadUrl,
+  serverURL: livePreviewServerURL,
   depth: 1,
 })
 
