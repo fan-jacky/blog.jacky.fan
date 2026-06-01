@@ -62,6 +62,15 @@ const initialPost = fetchedPost.value as PayloadPost
 const { data: post } = useLivePreview<PayloadPost>({
   initialData: initialPost,
   serverURL: livePreviewServerURL,
+  requestHandler: ({ data, endpoint }) => {
+    return fetch(`/api/payload-live-preview/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+  },
   depth: 1,
 })
 

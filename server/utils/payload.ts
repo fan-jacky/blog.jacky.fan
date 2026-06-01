@@ -9,7 +9,7 @@ interface FetchPayloadPostsOptions {
   slug?: string
 }
 
-function getPayloadHeaders() {
+export function getPayloadConnection() {
   const config = useRuntimeConfig()
 
   return {
@@ -52,7 +52,7 @@ export async function fetchPayloadPosts(
   event: H3Event,
   options: FetchPayloadPostsOptions = {}
 ) {
-  const { payloadURL, headers } = getPayloadHeaders()
+  const { payloadURL, headers } = getPayloadConnection()
 
   if (!payloadURL) {
     throw createError({ statusCode: 500, statusMessage: 'CMS URL is not configured' })
