@@ -15,6 +15,20 @@ const dirname = path.dirname(filename)
 
 dotenv.config({ path: path.resolve(dirname, '../.env') })
 
+function parseAllowedOrigins(...values: Array<string | undefined>) {
+  return values
+    .flatMap((value) => (value || '').split(','))
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .filter((value, index, all) => all.indexOf(value) === index)
+}
+
+const allowedOrigins = parseAllowedOrigins(
+  process.env.PAYLOAD_PUBLIC_SITE_URL,
+  process.env.PAYLOAD_PUBLIC_SITE_URLS,
+  process.env.PAYLOAD_PUBLIC_SERVER_URL,
+)
+
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
@@ -63,14 +77,12 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
   },
-  cors: [
-    process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000',
-    process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
-  ],
-  csrf: [
-    process.env.PAYLOAD_PUBLIC_SITE_URL || 'http://localhost:3000',
-    process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
-  ],
+  cors: allowedOrigins.length > 0
+    ? allowedOrigins
+    : ['http://localhost:3000', 'http://localhost:3001'],
+  csrf: allowedOrigins.length > 0
+    ? allowedOrigins
+    : ['http://localhost:3000', 'http://localhost:3001'],
   upload: {
     limits: {
       fileSize: 10000000, // 10 MB
