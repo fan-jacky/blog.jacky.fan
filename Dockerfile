@@ -15,6 +15,10 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=4100
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=4100
 
 COPY --from=builder /app/.output ./.output
 
