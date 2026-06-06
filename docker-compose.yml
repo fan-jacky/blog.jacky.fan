@@ -30,7 +30,7 @@ services:
       - ./cms/.env
     environment:
       DATABASE_URI: mongodb://mongodb:27017/blog-cms
-      PORT: "3001"
+      PORT: "4101"
     volumes:
       - cms_uploads:/app/uploads
     ports:
@@ -49,8 +49,8 @@ services:
     env_file:
       - .env
     environment:
-      NUXT_PAYLOAD_URL: http://cms:3001
-      PAYLOAD_URL: http://cms:3001
+      NUXT_PAYLOAD_URL: http://cms:4101
+      PAYLOAD_URL: http://cms:4101
       NUXT_PUBLIC_PAYLOAD_URL: ${NUXT_PUBLIC_PAYLOAD_URL:-http://localhost:4101}
     ports:
       - "4100:4100"
