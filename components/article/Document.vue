@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { PayloadPost } from '~/types/payload'
-import SlateRenderer from '~/components/content/SlateRenderer.vue'
-import { estimateReadTime, formatPayloadDate } from '~/utils/payloadPost'
+import { estimateContentBlocksReadTime, formatPayloadDate } from '~/utils/payloadPost'
 
 const props = defineProps<{
     post: PayloadPost
 }>()
 
 const formattedDate = computed(() => formatPayloadDate(props.post.publishedDate))
-const readTime = computed(() => estimateReadTime(props.post.content ?? []))
-const contentNodes = computed(() => props.post.content ?? [])
-const hasContent = computed(() => contentNodes.value.length > 0)
+const contentBlocks = computed(() => props.post.content ?? [])
+const readTime = computed(() => estimateContentBlocksReadTime(contentBlocks.value))
+const hasContent = computed(() => contentBlocks.value.length > 0)
 </script>
 
 <template>
@@ -43,9 +42,9 @@ const hasContent = computed(() => contentNodes.value.length > 0)
                 &nbsp;|&nbsp;
                 <IconsClock class="w-auto h-[1.2em] mb-1 mr-1 inline" />{{ readTime }} min read
             </small>
-            <SlateRenderer
+            <ContentBlocksRenderer
                 v-if="hasContent"
-                :nodes="contentNodes"
+                :blocks="contentBlocks"
             />
             <p v-else class="text-base-content/50 italic">No content yet.</p>
         </article>

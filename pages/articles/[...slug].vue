@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PayloadPost, PayloadPostSummary } from '~/types/payload'
-import { extractTableOfContents, normalizePayloadSlug } from '~/utils/payloadPost'
+import { extractContentBlocksTableOfContents, normalizePayloadSlug } from '~/utils/payloadPost'
 
 const route = useRoute()
 const slug = normalizePayloadSlug(route.params.slug as string | string[] | undefined)
@@ -28,7 +28,7 @@ if (error.value) {
 
 const previewCookie = useCookie('payload-preview')
 
-const tocLinks = computed(() => extractTableOfContents(post.value?.content ?? []))
+const tocLinks = computed(() => extractContentBlocksTableOfContents(post.value?.content ?? []))
 
 const currentPostIndex = computed(() =>
     (posts.value ?? []).findIndex(({ slug: entrySlug }) => entrySlug === post.value?.slug)

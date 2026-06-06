@@ -1,4 +1,33 @@
 import type { CollectionConfig } from 'payload'
+import { CodeBlock } from '../blocks/CodeBlock'
+import { RichTextBlock } from '../blocks/RichTextBlock'
+
+function isLegacySlateContent(value: unknown): value is Array<Record<string, unknown>> {
+  return Array.isArray(value) && value.some((item) => {
+    if (!item || typeof item !== 'object') {
+      return false
+    }
+
+    return !('blockType' in item) && ('children' in item || 'text' in item || 'type' in item)
+  })
+}
+
+function normalizeContentBlocks(value: unknown) {
+  if (!isLegacySlateContent(value)) {
+    return value
+  }
+
+  return [
+    {
+      blockType: 'richText',
+      body: value,
+    },
+  ]
+}
+
+function canManagePosts({ req }: { req: { user?: unknown } }) {
+  return Boolean(req.user)
+}
 
 const Posts: CollectionConfig = {
   slug: 'posts',
@@ -39,7 +68,11 @@ const Posts: CollectionConfig = {
     },
   },
   access: {
+    admin: canManagePosts,
+    create: canManagePosts,
     read: () => true,
+    update: canManagePosts,
+    delete: canManagePosts,
   },
   fields: [
     {
@@ -107,9 +140,14 @@ const Posts: CollectionConfig = {
     },
     {
       name: 'content',
-      type: 'richText',
+      type: 'blocks',
       label: 'Content',
       required: true,
+      blocks: [RichTextBlock, CodeBlock],
+      hooks: {
+        afterRead: [({ value }) => normalizeContentBlocks(value)],
+        beforeValidate: [({ value }) => normalizeContentBlocks(value)],
+      },
     },
     {
       name: 'featuredImage',

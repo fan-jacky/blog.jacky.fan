@@ -1,3 +1,5 @@
+@import 'highlight.js/styles/github-dark.css';
+
 body {
   /* Font Smoothing */
   -webkit-font-smoothing: antialiased;

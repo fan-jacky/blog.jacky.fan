@@ -2,8 +2,10 @@ import { fileURLToPath } from "node:url";
 
 const internalPayloadUrl =
     process.env.NUXT_PAYLOAD_URL ||
+    process.env.NUXT_PUBLIC_PAYLOAD_URL ||
+    process.env.PAYLOAD_PUBLIC_SERVER_URL ||
     process.env.PAYLOAD_URL ||
-    'http://localhost:3001'
+    'http://localhost:4101'
 
 const publicPayloadUrl =
     process.env.NUXT_PUBLIC_PAYLOAD_URL ||

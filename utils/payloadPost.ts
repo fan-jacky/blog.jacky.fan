@@ -1,8 +1,16 @@
-import type { PayloadTocLink } from '~/types/payload'
+import type { PayloadContentBlock, PayloadTocLink } from '~/types/payload'
 import type { SlateLeaf, SlateNode } from '~/types/slate'
 
 function isSlateLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
+}
+
+function isRichTextBlock(block: PayloadContentBlock): block is Extract<PayloadContentBlock, { blockType: 'richText' }> {
+  return block.blockType === 'richText'
+}
+
+function isCodeBlock(block: PayloadContentBlock): block is Extract<PayloadContentBlock, { blockType: 'codeBlock' }> {
+  return block.blockType === 'codeBlock'
 }
 
 export function normalizePayloadSlug(slug: string | string[] | undefined) {
@@ -37,6 +45,29 @@ export function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): 
 
 export function estimateReadTime(nodes: SlateNode[] = []) {
   const wordCount = extractTextFromSlate(nodes).split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(wordCount / 250))
+}
+
+export function extractTextFromContentBlocks(blocks: PayloadContentBlock[] = []): string {
+  return blocks
+    .map((block) => {
+      if (isRichTextBlock(block)) {
+        return extractTextFromSlate(block.body ?? [])
+      }
+
+      if (isCodeBlock(block)) {
+        return block.code ?? ''
+      }
+
+      return ''
+    })
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function estimateContentBlocksReadTime(blocks: PayloadContentBlock[] = []) {
+  const wordCount = extractTextFromContentBlocks(blocks).split(/\s+/).filter(Boolean).length
   return Math.max(1, Math.ceil(wordCount / 250))
 }
 
@@ -90,4 +121,10 @@ export function extractTableOfContents(nodes: SlateNode[] = []) {
   }
 
   return links
+}
+
+export function extractContentBlocksTableOfContents(blocks: PayloadContentBlock[] = []) {
+  return blocks
+    .filter(isRichTextBlock)
+    .flatMap((block) => extractTableOfContents(block.body ?? []))
 }

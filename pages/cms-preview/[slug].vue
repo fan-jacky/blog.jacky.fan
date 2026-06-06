@@ -1,20 +1,7 @@
 <script setup lang="ts">
-import type { SlateNode, SlateLeaf } from '~/types/slate'
 import type { PayloadPost } from '~/types/payload'
 import { useLivePreview } from '@payloadcms/live-preview-vue'
-import SlateRenderer from '~/components/content/SlateRenderer.vue'
-
-function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): string {
-  return nodes
-    .map((node) => {
-      if ('text' in node && typeof node.text === 'string') return node.text
-      if ('children' in node && Array.isArray(node.children)) {
-        return extractTextFromSlate(node.children)
-      }
-      return ''
-    })
-    .join(' ')
-}
+import { estimateContentBlocksReadTime } from '~/utils/payloadPost'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -90,14 +77,11 @@ const formattedDate = computed(() => {
 })
 
 const estimatedReadTime = computed(() => {
-  if (!post.value?.content) return 0
-  const text = extractTextFromSlate(post.value.content)
-  const wordCount = text.split(/\s+/).filter(Boolean).length
-  return Math.max(1, Math.ceil(wordCount / 250))
+  return estimateContentBlocksReadTime(post.value?.content ?? [])
 })
 
-const contentNodes = computed(() => post.value?.content ?? [])
-const hasContent = computed(() => contentNodes.value.length > 0)
+const contentBlocks = computed(() => post.value?.content ?? [])
+const hasContent = computed(() => contentBlocks.value.length > 0)
 </script>
 
 <template>
@@ -153,10 +137,9 @@ const hasContent = computed(() => contentNodes.value.length > 0)
                 min read
               </small>
 
-              <!-- Rich text content rendered from Payload Slate JSON -->
-              <SlateRenderer
+              <ContentBlocksRenderer
                 v-if="hasContent"
-                :nodes="contentNodes"
+                :blocks="contentBlocks"
               />
               <p v-else class="text-base-content/50 italic">
                 No content yet.

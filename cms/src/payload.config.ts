@@ -8,7 +8,6 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
-import { codeBlock } from './editor/slate/codeBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -48,7 +47,6 @@ export default buildConfig({
     admin: {
       elements: [
         'blockquote',
-        codeBlock,
         'h1',
         'h2',
         'h3',

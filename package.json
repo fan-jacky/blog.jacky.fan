@@ -2,9 +2,9 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev -p 4100",
     "generate": "nuxt generate",
-    "preview": "nuxt preview"
+    "preview": "nuxt preview -p 4100"
   },
   "devDependencies": {
     "@nuxt/content": "^2.6.0",
@@ -21,6 +21,7 @@
   "dependencies": {
     "@payloadcms/live-preview-vue": "^3.85.0",
     "@tailwindcss/typography": "^0.5.9",
-    "daisyui": "^3.1.0"
+    "daisyui": "^3.1.0",
+    "highlight.js": "^11.11.1"
   }
 }

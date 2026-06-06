@@ -17,6 +17,9 @@ importers:
       daisyui:
         specifier: ^3.1.0
         version: 3.9.4(yaml@2.9.0)
+      highlight.js:
+        specifier: ^11.11.1
+        version: 11.11.1
     devDependencies:
       '@nuxt/content':
         specifier: ^2.6.0
@@ -2570,6 +2573,10 @@ packages:
 
   hastscript@9.0.1:
     resolution: {integrity: sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==}
+
+  highlight.js@11.11.1:
+    resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
+    engines: {node: '>=12.0.0'}
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
@@ -7243,6 +7250,8 @@ snapshots:
       hast-util-parse-selector: 4.0.0
       property-information: 7.1.0
       space-separated-tokens: 2.0.2
+
+  highlight.js@11.11.1: {}
 
   hookable@5.5.3: {}
 
