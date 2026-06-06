@@ -34,7 +34,7 @@ services:
     volumes:
       - cms_uploads:/app/uploads
     ports:
-      - "4101:3001"
+      - "4101:4101"
     networks:
       - blog_network
 
@@ -53,7 +53,7 @@ services:
       PAYLOAD_URL: http://cms:3001
       NUXT_PUBLIC_PAYLOAD_URL: ${NUXT_PUBLIC_PAYLOAD_URL:-http://localhost:4101}
     ports:
-      - "4100:3000"
+      - "4100:4100"
     networks:
       - blog_network
 
