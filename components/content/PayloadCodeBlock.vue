@@ -51,15 +51,8 @@ async function copyToClipboard(value: string) {
       <div v-if="normalizedLanguage" class="payload-code-block__language">
         {{ normalizedLanguage }}
       </div>
-      <pre class="payload-code-block__pre"><code class="hljs payload-code-block__code">
-<span
-  v-for="(line, index) in highlightedLines"
-  :key="index"
-  class="payload-code-block__line"
-  :data-line-number="showLineNumbers ? index + 1 : undefined"
-  v-html="line || '&nbsp;'"
- />
-      </code></pre>
+      <pre
+        class="payload-code-block__pre"><code class="hljs payload-code-block__code"> <span v-for="(line, index) in highlightedLines" :key="index" class="payload-code-block__line" :data-line-number="showLineNumbers ? index + 1 : undefined" v-html="line || '&nbsp;'" /> </code></pre>
       <button
         class="payload-code-block__copy btn btn-square btn-sm"
         aria-label="Copy code"
@@ -91,7 +84,7 @@ async function copyToClipboard(value: string) {
 .payload-code-block__pre {
   margin: 0;
   overflow-x: auto;
-  padding: 1rem 1rem 1rem 0;
+  padding: 0 1rem 0 0;
 }
 
 .payload-code-block__code {
