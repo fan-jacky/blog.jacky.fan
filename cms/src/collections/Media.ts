@@ -7,6 +7,7 @@ const dirname = path.dirname(filename)
 
 const Media: CollectionConfig = {
   slug: 'media',
+  folders: true,
   upload: {
     staticDir: path.resolve(dirname, '../../uploads'),
     mimeTypes: ['image/*'],
