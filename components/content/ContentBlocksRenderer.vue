@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full my-6">
     <template v-for="(block, index) in blocks" :key="`${block.blockType}-${block.id ?? index}`">
       <SlateRenderer
         v-if="block.blockType === 'richText'"

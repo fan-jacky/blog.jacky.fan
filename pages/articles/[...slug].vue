@@ -60,18 +60,18 @@ useHead(() => ({
         <main class="max-w-[1280px] px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <div class="col-span-3">
-                                        <ArticleDocument v-if="post" :post="post" />
-                                        <ArticleNavigator :prev="prevPost" :next="nextPost" />
-                    <ArticleComments />
+                    <ArticleDocument v-if="post" :post="post" />
+                    <ArticleNavigator :prev="prevPost" :next="nextPost" />
+                    <!-- <ArticleComments /> -->
                 </div>
                 <div>
                     <AuthorPanel />
                     <LatestPostPanel />
-                                        <ArticleTableOfContent :links="tocLinks" />
+                    <ArticleTableOfContent :links="tocLinks" />
                 </div>
             </div>
         </main>
-                <PreviewBar v-if="previewCookie" />
+        <PreviewBar v-if="previewCookie" />
         <Footer />
     </div>
 </template>
