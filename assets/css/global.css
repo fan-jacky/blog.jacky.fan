@@ -7,3 +7,13 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
 }
+
+.prose.w-full {
+  max-width: 100%;
+}
+
+.article-content {
+  img {
+    border-radius: .8em;
+  }
+}
