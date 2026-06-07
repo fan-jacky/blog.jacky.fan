@@ -205,7 +205,7 @@ const RenderedSlate = defineComponent({
     :aria-label="activeImage.alt"
     @click.self="closeImageModal"
   >
-    <div class="modal-box relative max-w-6xl bg-transparent p-0 shadow-none">
+    <div class="modal-box relative max-w-6xl bg-transparent p-0 shadow-none flex justify-center items-center">
       <button
         type="button"
         class="btn btn-circle btn-sm btn-neutral absolute right-2 top-2 z-10 text-base-100"
