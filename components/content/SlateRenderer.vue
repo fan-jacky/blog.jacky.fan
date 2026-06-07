@@ -10,6 +10,7 @@ const props = defineProps<{
 }>()
 
 const config = useRuntimeConfig()
+const activeImage = ref<{ alt: string, src: string } | null>(null)
 
 function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
@@ -87,37 +88,12 @@ function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
     .join('')
 }
 
-function createImageModalId(src: string, key?: number | string): string {
-  const slug = src
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-  return `article-image-modal-${slug || 'image'}${key !== undefined ? `-${String(key)}` : ''}`
+function openImageModal(image: { alt: string, src: string }): void {
+  activeImage.value = image
 }
 
-function openImageModal(modalId: string): void {
-  if (!import.meta.client) {
-    return
-  }
-
-  const modal = document.getElementById(modalId)
-
-  if (modal instanceof HTMLDialogElement) {
-    modal.showModal()
-  }
-}
-
-function closeImageModal(modalId: string): void {
-  if (!import.meta.client) {
-    return
-  }
-
-  const modal = document.getElementById(modalId)
-
-  if (modal instanceof HTMLDialogElement) {
-    modal.close()
-  }
+function closeImageModal(): void {
+  activeImage.value = null
 }
 
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
@@ -130,55 +106,20 @@ function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null
 
   const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
   const caption = media?.alt?.trim()
-  const modalId = createImageModalId(src, key)
 
-  return h('div', [
-    h('figure', [
-      h(
-        'button',
-        {
-          'aria-label': `Open full size image: ${alt}`,
-          class: 'block w-full cursor-zoom-in border-0 bg-transparent p-0 text-left',
-          key,
-          type: 'button',
-          onClick: () => openImageModal(modalId),
-        },
-        [h('img', { alt, loading: 'lazy', src })],
-      ),
-      caption ? h('figcaption', caption) : null,
-    ]),
+  return h('figure', [
     h(
-      'dialog',
+      'button',
       {
-        class: 'modal',
-        id: modalId,
-        onClick: (event: MouseEvent) => {
-          if (event.target === event.currentTarget) {
-            closeImageModal(modalId)
-          }
-        },
+        'aria-label': `Open full size image: ${alt}`,
+        class: 'block w-full cursor-zoom-in border-0 bg-transparent p-0 text-left',
+        key,
+        type: 'button',
+        onClick: () => openImageModal({ alt, src }),
       },
-      [
-        h('div', { class: 'modal-box relative max-w-6xl bg-transparent p-0 shadow-none' }, [
-          h(
-            'button',
-            {
-              'aria-label': 'Close image preview',
-              class: 'btn btn-circle btn-sm btn-neutral absolute right-2 top-2 text-base-100',
-              type: 'button',
-              onClick: () => closeImageModal(modalId),
-            },
-            '✕',
-          ),
-          h('img', {
-            alt,
-            class: 'max-h-[85vh] w-fit max-w-full rounded-xl object-contain m-auto',
-            src,
-          }),
-        ]),
-        h('form', { class: 'modal-backdrop', method: 'dialog' }, [h('button', 'close')]),
-      ],
+      [h('img', { alt, loading: 'lazy', src })],
     ),
+    caption ? h('figcaption', caption) : null,
   ])
 }
 
@@ -255,5 +196,30 @@ const RenderedSlate = defineComponent({
 <template>
   <div class="prose prose-slate w-full">
     <RenderedSlate />
+  </div>
+  <div
+    v-if="activeImage"
+    class="modal modal-open"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="activeImage.alt"
+    @click.self="closeImageModal"
+  >
+    <div class="modal-box relative max-w-6xl bg-transparent p-0 shadow-none">
+      <button
+        type="button"
+        class="btn btn-circle btn-sm btn-neutral absolute right-2 top-2 z-10 text-base-100"
+        aria-label="Close image preview"
+        @click="closeImageModal"
+      >
+        ✕
+      </button>
+      <img
+        :src="activeImage.src"
+        :alt="activeImage.alt"
+        class="m-auto max-h-[85vh] w-fit max-w-full rounded-xl object-contain"
+      >
+    </div>
+    <button type="button" class="modal-backdrop" aria-label="Close image preview" @click="closeImageModal" />
   </div>
 </template>
