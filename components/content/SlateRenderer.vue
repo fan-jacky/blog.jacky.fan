@@ -87,7 +87,40 @@ function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
     .join('')
 }
 
-function renderUpload(node: SlateNode): VNodeChild | null {
+function createImageModalId(src: string, key?: number | string): string {
+  const slug = src
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return `article-image-modal-${slug || 'image'}${key !== undefined ? `-${String(key)}` : ''}`
+}
+
+function openImageModal(modalId: string): void {
+  if (!import.meta.client) {
+    return
+  }
+
+  const modal = document.getElementById(modalId)
+
+  if (modal instanceof HTMLDialogElement) {
+    modal.showModal()
+  }
+}
+
+function closeImageModal(modalId: string): void {
+  if (!import.meta.client) {
+    return
+  }
+
+  const modal = document.getElementById(modalId)
+
+  if (modal instanceof HTMLDialogElement) {
+    modal.close()
+  }
+}
+
+function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
   const media = typeof node.value === 'object' && node.value !== null ? node.value : null
   const src = resolveMediaURL(media?.url)
 
@@ -97,10 +130,55 @@ function renderUpload(node: SlateNode): VNodeChild | null {
 
   const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
   const caption = media?.alt?.trim()
+  const modalId = createImageModalId(src, key)
 
-  return h('figure', [
-    h('img', { alt, loading: 'lazy', src }),
-    caption ? h('figcaption', caption) : null,
+  return h('div', [
+    h('figure', [
+      h(
+        'button',
+        {
+          'aria-label': `Open full size image: ${alt}`,
+          class: 'block w-full cursor-zoom-in border-0 bg-transparent p-0 text-left',
+          key,
+          type: 'button',
+          onClick: () => openImageModal(modalId),
+        },
+        [h('img', { alt, loading: 'lazy', src })],
+      ),
+      caption ? h('figcaption', caption) : null,
+    ]),
+    h(
+      'dialog',
+      {
+        class: 'modal',
+        id: modalId,
+        onClick: (event: MouseEvent) => {
+          if (event.target === event.currentTarget) {
+            closeImageModal(modalId)
+          }
+        },
+      },
+      [
+        h('div', { class: 'modal-box relative max-w-6xl bg-transparent p-0 shadow-none' }, [
+          h(
+            'button',
+            {
+              'aria-label': 'Close image preview',
+              class: 'btn btn-circle btn-sm btn-neutral absolute right-2 top-2 text-base-100',
+              type: 'button',
+              onClick: () => closeImageModal(modalId),
+            },
+            '✕',
+          ),
+          h('img', {
+            alt,
+            class: 'max-h-[85vh] w-fit max-w-full rounded-xl object-contain m-auto',
+            src,
+          }),
+        ]),
+        h('form', { class: 'modal-backdrop', method: 'dialog' }, [h('button', 'close')]),
+      ],
+    ),
   ])
 }
 
@@ -154,7 +232,7 @@ function renderNode(
       )
     }
     case 'upload':
-      return renderUpload(node)
+      return renderUpload(node, key)
     default:
       return children.length > 0 ? h('p', { key }, children) : null
   }
