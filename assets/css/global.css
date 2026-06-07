@@ -15,5 +15,6 @@ body {
 .article-content {
   img {
     border-radius: .8em;
+    margin: 0;
   }
 }
