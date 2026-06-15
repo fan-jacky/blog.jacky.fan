@@ -4,26 +4,32 @@ import { extractContentBlocksTableOfContents, normalizePayloadSlug } from '~/uti
 
 const route = useRoute()
 const slug = normalizePayloadSlug(route.params.slug as string | string[] | undefined)
+const post = ref<PayloadPost | null>(null)
+const posts = ref<PayloadPostSummary[]>([])
 
 if (!slug) {
-    throw createError({ statusCode: 400, statusMessage: 'Missing slug parameter', fatal: true })
+    await navigateTo('/', { redirectCode: 301 })
 }
+else {
+    const [{ data: fetchedPost, error }, { data: fetchedPosts }] = await Promise.all([
+        useFetch<PayloadPost>(`/api/payload-post/${encodeURIComponent(slug)}`, {
+            key: `payload-post-${slug}`,
+        }),
+        useFetch<PayloadPostSummary[]>('/api/payload-posts', {
+            key: 'payload-posts',
+        }),
+    ])
 
-const [{ data: post, error }, { data: posts }] = await Promise.all([
-    useFetch<PayloadPost>(`/api/payload-post/${encodeURIComponent(slug)}`, {
-        key: `payload-post-${slug}`,
-    }),
-    useFetch<PayloadPostSummary[]>('/api/payload-posts', {
-        key: 'payload-posts',
-    }),
-])
+    if (error.value) {
+        throw createError({
+            statusCode: error.value.statusCode ?? 404,
+            statusMessage: error.value.statusMessage ?? 'Post not found',
+            fatal: true,
+        })
+    }
 
-if (error.value) {
-    throw createError({
-        statusCode: error.value.statusCode ?? 404,
-        statusMessage: error.value.statusMessage ?? 'Post not found',
-        fatal: true,
-    })
+    post.value = fetchedPost.value ?? null
+    posts.value = fetchedPosts.value ?? []
 }
 
 const previewCookie = useCookie('payload-preview')
