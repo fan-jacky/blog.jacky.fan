@@ -3,12 +3,13 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock* package-lock.json* ./
-# Use npm install to support both lock-file formats
-RUN npm install --legacy-peer-deps
+RUN npm install -g pnpm@10
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # ─── Production stage ─────────────────────────────────────────────────────────
 FROM node:26-alpine AS runner

@@ -4,11 +4,17 @@ import { fetchPayloadPosts } from '~/server/utils/payload'
 export default defineEventHandler(async (event) => {
 
     const domain = "blog.jacky.fan"
-    const posts = await fetchPayloadPosts(event, {
-        depth: 0,
-        draft: false,
-        onlyPublished: true,
-    })
+    let posts = []
+
+    try {
+        posts = await fetchPayloadPosts(event, {
+            depth: 0,
+            draft: false,
+            onlyPublished: true,
+        })
+    } catch (error) {
+        console.warn('[rss] Falling back to an empty feed because CMS posts could not be fetched.', error)
+    }
 
     const data = await new Promise(async (resolve, reject) => {
         try {

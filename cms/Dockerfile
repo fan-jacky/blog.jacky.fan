@@ -3,14 +3,16 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
+RUN npm install -g pnpm@10
+
 # Install dependencies (including devDependencies needed for the build)
-COPY package.json tsconfig.json next.config.ts next-env.d.ts ./
+COPY package.json pnpm-lock.yaml tsconfig.json next.config.ts next-env.d.ts ./
 COPY src ./src
-RUN npm install --legacy-peer-deps
+RUN pnpm install --frozen-lockfile
 
 # Copy source and build
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # ─── Production stage ─────────────────────────────────────────────────────────
 FROM node:26-alpine AS runner
@@ -18,6 +20,8 @@ FROM node:26-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3001
+
+RUN npm install -g pnpm@10
 
 # Copy only what is needed to run the app
 COPY --from=builder /app/.next ./.next
@@ -27,4 +31,4 @@ COPY --from=builder /app/next.config.ts ./
 
 EXPOSE 3001
 
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "run", "start"]
