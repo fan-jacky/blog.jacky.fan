@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const limit = typeof query.limit === 'string' ? Number.parseInt(query.limit, 10) : undefined
 
     const posts = await fetchPayloadPosts(event, {
-      depth: 0,
+      depth: 1,
       limit: Number.isFinite(limit) ? limit : undefined,
     })
 

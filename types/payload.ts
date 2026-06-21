@@ -45,6 +45,7 @@ export interface PayloadPostSummary {
   author?: string | null
   publishedDate?: string | null
   status: 'draft' | 'published'
+  featuredImage?: PayloadMedia | number | string | null
 }
 
 export interface PayloadTocLink {

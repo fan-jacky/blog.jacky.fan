@@ -91,5 +91,6 @@ export function toPayloadPostSummary(post: PayloadPost): PayloadPostSummary {
     author: post.author,
     publishedDate: post.publishedDate,
     status: post.status,
+    featuredImage: post.featuredImage,
   }
 }

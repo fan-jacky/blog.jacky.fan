@@ -13,7 +13,7 @@ const hasContent = computed(() => contentBlocks.value.length > 0)
 </script>
 
 <template>
-    <div class="bg-base-100 rounded-3xl shadow-md my-4 px-4 md:px-8 py-12">
+    <div class="bg-base-100 rounded-2xl shadow-md my-4 px-4 md:px-8 py-12">
         <div class="breadcrumbs mb-2">
             <ul class="text-sm">
                 <li class="prose text-sm">

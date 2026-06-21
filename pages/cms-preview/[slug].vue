@@ -88,13 +88,13 @@ const hasContent = computed(() => contentBlocks.value.length > 0)
   <div class="bg-base-300 min-h-screen h-full">
     <NavBar />
     <main
-      class="max-w-[1280px] px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen"
+      class="container px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen"
     >
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div class="col-span-3">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div class="col-span-4">
           <div
             v-if="post"
-            class="bg-base-100 rounded-3xl shadow-md my-4 px-4 md:px-8 py-12"
+            class="bg-base-100 rounded-2xl shadow-md my-4 px-4 md:px-8 py-12"
           >
             <!-- Breadcrumbs -->
             <div class="breadcrumbs mb-2">
