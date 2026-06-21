@@ -1,8 +1,8 @@
 <template>
     <div class="navbar bg-base-200 shadow-md">
         <div class="flex-1">
-            <NuxtLink to="/" class="btn btn-ghost normal-case text-xl font-dosis drop-shadow">🖋️<span
-                    className="text-primary">Jacky
+                <NuxtLink to="/" class="btn btn-ghost normal-case text-xl font-dosis drop-shadow">🖋️<span
+                    class="text-primary">Jacky
                     FAN's</span>
                 Blog</NuxtLink>
         </div>

@@ -122,16 +122,16 @@ const hasContent = computed(() => contentBlocks.value.length > 0)
               <small>
                 <IconsDateIcon
                   v-if="formattedDate"
-                  className="w-auto h-[1.2em] mb-1 mr-1 inline"
+                  class="w-auto h-[1.2em] mb-1 mr-1 inline"
                 />{{ formattedDate }}
                 <template v-if="post.author">
                   &nbsp;|&nbsp;
-                  <IconsPersonIcon className="w-auto h-[1.2em] mb-1 mr-1 inline" />{{
+                  <IconsPersonIcon class="w-auto h-[1.2em] mb-1 mr-1 inline" />{{
                     post.author
                   }}
                 </template>
                 &nbsp;|&nbsp;
-                <IconsClock className="w-auto h-[1.2em] mb-1 mr-1 inline" />{{
+                <IconsClock class="w-auto h-[1.2em] mb-1 mr-1 inline" />{{
                   estimatedReadTime
                 }}
                 min read

@@ -79,29 +79,29 @@ function resolveFeaturedImageAlt(article: PayloadPostSummary) {
       <Title>Jacky FAN's Blog - A Personal Blog by Jacky FAN</Title>
     </Head>
     <NavBar />
-    <main className="container px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="col-span-4">
+    <main class="container px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div class="col-span-4">
           <!-- Show article list -->
           <div>
             <!-- for SEO -->
-            <h1 className="hidden">Jacky FAN's Blog</h1>
+            <h1 class="hidden">Jacky FAN's Blog</h1>
 
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div class="flex flex-wrap gap-4 justify-center">
               <NuxtLink :to="buildArticlePath(article.slug)" v-for="article in paginatedArticles" :key="article.id"
-                className="card bg-base-100 w-full sm:w-80 shadow-sm transition-all hover:scale-105 duration-300">
+                class="card bg-base-100 w-full sm:w-80 shadow-sm transition-all hover:scale-105 duration-300">
                 <figure class="article-card-gradient aspect-video" v-if="article.featuredImage">
                   <img :src="resolveFeaturedImageUrl(article)" :alt="resolveFeaturedImageAlt(article)"
                     class="h-full w-full object-cover" />
                 </figure>
-                <div className="article-card-gradient aspect-video" v-else>
-                  <div className="flex items-center justify-center h-full w-full text-white text-3xl font-bold">
+                <div class="article-card-gradient aspect-video" v-else>
+                  <div class="flex items-center justify-center h-full w-full text-white text-3xl font-bold">
                   </div>
                 </div>
-                <div className="card-body p-6">
-                  <h2 className="card-title">{{ article.title }}</h2>
+                <div class="card-body p-6">
+                  <h2 class="card-title">{{ article.title }}</h2>
                   <small v-if="article.publishedDate">
-                    <IconsDateIcon className="h-[1rem] mb-1 mr-1 inline" />{{ formatPayloadDate(article.publishedDate)
+                    <IconsDateIcon class="h-[1rem] mb-1 mr-1 inline" />{{ formatPayloadDate(article.publishedDate)
                     }}
                   </small>
                 </div>

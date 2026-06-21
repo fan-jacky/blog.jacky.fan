@@ -2,7 +2,7 @@
     <div class="bg-base-100 rounded-lg shadow-md my-4 px-8 py-12 hidden lg:block sticky top-4">
         <div class="prose">
             <h4 class="text-xl">
-                <IconsTableOfContent className="inline h-[1.2em] mb-1 mr-1" />
+                <IconsTableOfContent class="inline h-[1.2em] mb-1 mr-1" />
                 Table of Content
             </h4>
             <ul v-if="links.length">

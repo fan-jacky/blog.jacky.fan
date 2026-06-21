@@ -12,7 +12,7 @@ defineProps<{
     <div class="flex max-w-full">
         <NuxtLink v-if="prev" :to="buildArticlePath(prev.slug)" class="flex-shrink bg-base-100 rounded-lg shadow-md my-4 px-4 md:px-8 py-6 md:py-12 w-5/12 md:w-fit">
             <div class="flex h-full w-full">
-                <IconsArrowLeft className="h-[1.2rem] my-auto hidden md:inline mr-4" />
+                <IconsArrowLeft class="h-[1.2rem] my-auto hidden md:inline mr-4" />
                 <div class="prose max-w-full">
                     <small>Previous Article</small>
                     <h6 class="font-bold truncate"> {{ prev.title }} </h6>
@@ -26,7 +26,7 @@ defineProps<{
                     <small>Next Article</small>
                     <h6 class="font-bold truncate"> {{ next.title }} </h6>
                 </div>
-                <IconsArrowRight className="h-[1.2rem] my-auto hidden md:inline ml-4" />
+                <IconsArrowRight class="h-[1.2rem] my-auto hidden md:inline ml-4" />
             </div>
         </NuxtLink>
     </div>

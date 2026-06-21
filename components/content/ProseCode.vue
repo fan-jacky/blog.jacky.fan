@@ -1,9 +1,9 @@
 <template>
     <div class="mockup-code prose-mockup-code shadow relative rounded-2xl">
         <slot />
-        <button className="btn btn-square btn-sm absolute bottom-4 right-4 inline opacity-95 flex justify-center items-center" aria-label="Copy Code"
+        <button class="btn btn-square btn-sm absolute bottom-4 right-4 opacity-95 flex justify-center items-center" aria-label="Copy Code"
             @click="copyToClipboard(code)">
-            <IconsCopyClipboard className="p-1" />
+            <IconsCopyClipboard class="p-1" />
         </button>
     </div>
     <p v-if="filename" class="text-center">
