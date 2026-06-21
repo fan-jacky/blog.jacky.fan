@@ -66,7 +66,7 @@ function setPage(nextPage: number) {
           </div>
           <div v-if="totalPages > 1" class="my-4 px-8 pt-12 lg:pb-4 text-center">
             <div class="join">
-              <input class="join-item btn btn-square" type="radio" name="options" :aria-label="(n).toString()"
+              <input class="join-item btn btn-square px-3" type="radio" name="options" :aria-label="(n).toString()"
                 @click="setPage(n)" :checked="n === page"
                 v-for="n in totalPages" :key="n" />
             </div>
