@@ -15,6 +15,7 @@ const publicPayloadUrl =
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
     workspaceDir: fileURLToPath(new URL(".", import.meta.url)),
+    compatibilityDate: '2026-06-21',
     ignore: ["cms", "cms/**"],
     app: {
         pageTransition: { name: "page", mode: "out-in" },
@@ -62,5 +63,6 @@ export default defineNuxtConfig({
             routes: ["/sitemap.xml", "/rss.xml"],
         },
     },
-    css: ['~/assets/css/global.css']
+    css: ['~/assets/css/global.css'],
+    ssr: true,
 });
