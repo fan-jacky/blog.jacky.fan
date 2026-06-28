@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PayloadPost, PayloadPostSummary } from '~/types/payload'
-import { extractContentBlocksTableOfContents, normalizePayloadSlug } from '~/utils/payloadPost'
+import { normalizePayloadSlug, parsePayloadTags } from '~/utils/payloadPost'
 
 const route = useRoute()
 const slug = normalizePayloadSlug(route.params.slug as string | string[] | undefined)
@@ -34,8 +34,6 @@ else {
 
 const previewCookie = useCookie('payload-preview')
 
-const tocLinks = computed(() => extractContentBlocksTableOfContents(post.value?.content ?? []))
-
 const currentPostIndex = computed(() =>
     (posts.value ?? []).findIndex(({ slug: entrySlug }) => entrySlug === post.value?.slug)
 )
@@ -52,6 +50,28 @@ const nextPost = computed(() => {
     return index > 0 ? entries[index - 1] : null
 })
 
+const relatedPosts = computed(() => {
+    const current = post.value
+
+    if (!current) {
+        return []
+    }
+
+    const currentTags = new Set(parsePayloadTags(current.tags).map((tag) => tag.toLowerCase()))
+
+    return (posts.value ?? [])
+        .filter(({ slug: entrySlug }) => entrySlug !== current.slug)
+        .map((entry) => {
+            const entryTags = parsePayloadTags(entry.tags).map((tag) => tag.toLowerCase())
+            const sharedScore = entryTags.filter((tag) => currentTags.has(tag)).length
+
+            return { entry, sharedScore }
+        })
+        .sort((left, right) => right.sharedScore - left.sharedScore)
+        .slice(0, 3)
+        .map(({ entry }) => entry)
+})
+
 useHead(() => ({
     title: post.value?.title ?? 'Article',
     meta: post.value?.description
@@ -61,21 +81,17 @@ useHead(() => ({
 </script>
 
 <template>
-    <div class="bg-base-300 min-h-screen h-full">
+    <div class="site-wrapper">
         <NavBar />
-        <main class="container px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
-                <div class="col-span-4">
-                    <ArticleDocument v-if="post" :post="post" />
+        <main id="main-content" class="site-main">
+            <section class="site-section site-section--article">
+                <div class="geo-circle geo-circle--sm" style="top:8%;right:5%;" />
+                <div class="container">
+                    <NuxtLink to="/articles" class="article-page__back-link">All articles</NuxtLink>
+                    <ArticleDocument v-if="post" :post="post" :related-posts="relatedPosts" />
                     <ArticleNavigator :prev="prevPost" :next="nextPost" />
-                    <!-- <ArticleComments /> -->
                 </div>
-                <div>
-                    <AuthorPanel />
-                    <LatestPostPanel />
-                    <ArticleTableOfContent :links="tocLinks" />
-                </div>
-            </div>
+            </section>
         </main>
         <PreviewBar v-if="previewCookie" />
         <Footer />

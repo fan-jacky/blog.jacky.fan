@@ -25,6 +25,53 @@ export function buildArticlePath(slug: string) {
   return `/articles/${slug}`
 }
 
+export function resolvePayloadMediaUrl(
+  image: { url?: string | null } | number | string | null | undefined,
+  runtimeConfig: ReturnType<typeof useRuntimeConfig>,
+) {
+  if (!image || typeof image !== 'object' || !image.url) {
+    return ''
+  }
+
+  try {
+    return new URL(image.url).toString()
+  } catch {
+    const base = runtimeConfig.public.payloadUrl || runtimeConfig.payloadUrl
+
+    if (!base) {
+      return image.url
+    }
+
+    try {
+      return new URL(image.url, base).toString()
+    } catch {
+      return image.url
+    }
+  }
+}
+
+export function resolvePayloadMediaAlt(
+  title: string,
+  image: { alt?: string | null } | number | string | null | undefined,
+) {
+  if (image && typeof image === 'object' && image.alt?.trim()) {
+    return image.alt
+  }
+
+  return `${title} featured image`
+}
+
+export function parsePayloadTags(tags?: string | null) {
+  return (tags ?? '')
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+}
+
+export function getPrimaryPayloadTag(tags?: string | null) {
+  return parsePayloadTags(tags)[0] ?? ''
+}
+
 export function extractTextFromSlate(nodes: Array<SlateNode | SlateLeaf> = []): string {
   return nodes
     .map((node) => {
@@ -72,7 +119,21 @@ export function estimateContentBlocksReadTime(blocks: PayloadContentBlock[] = []
 }
 
 export function formatPayloadDate(value?: string | null) {
-  return value ? new Date(value).toDateString() : ''
+  if (!value) {
+    return ''
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date)
 }
 
 export function createHeadingId(text: string, duplicates: Map<string, number>) {

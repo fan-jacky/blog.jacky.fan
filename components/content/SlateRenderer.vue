@@ -23,7 +23,7 @@ function renderLeaf(leaf: SlateLeaf): VNodeChild {
   if (leaf.italic) content = h('em', content)
   if (leaf.underline) content = h('u', content)
   if (leaf.strikethrough) content = h('s', content)
-  if (leaf.code) content = h('code', { class: 'bg-base-300 rounded px-1 text-sm' }, content)
+  if (leaf.code) content = h('code', content)
 
   return content
 }
@@ -112,7 +112,7 @@ function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null
       'button',
       {
         'aria-label': `Open full size image: ${alt}`,
-        class: 'block w-full cursor-zoom-in border-0 bg-transparent p-0 text-left',
+        class: 'article-prose__image-trigger',
         key,
         type: 'button',
         onClick: () => openImageModal({ alt, src }),
@@ -194,21 +194,21 @@ const RenderedSlate = defineComponent({
 </script>
 
 <template>
-  <div class="prose prose-slate w-full">
+  <div class="article-prose">
     <RenderedSlate />
   </div>
   <div
     v-if="activeImage"
-    class="modal modal-open"
+    class="content-modal"
     role="dialog"
     aria-modal="true"
     :aria-label="activeImage.alt"
     @click.self="closeImageModal"
   >
-    <div class="modal-box relative max-w-6xl bg-transparent p-0 shadow-none flex justify-center items-center">
+    <div class="content-modal__box">
       <button
         type="button"
-        class="btn btn-circle btn-sm btn-neutral absolute right-2 top-2 z-10 text-base-100"
+        class="content-modal__close"
         aria-label="Close image preview"
         @click="closeImageModal"
       >
@@ -217,9 +217,9 @@ const RenderedSlate = defineComponent({
       <img
         :src="activeImage.src"
         :alt="activeImage.alt"
-        class="m-auto max-h-[85vh] w-fit max-w-full rounded-xl object-contain"
+        class="content-modal__image"
       >
     </div>
-    <button type="button" class="modal-backdrop" aria-label="Close image preview" @click="closeImageModal" />
+    <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
   </div>
 </template>

@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     compatibilityDate: '2026-06-21',
     ignore: ["cms", "cms/**"],
     app: {
-        pageTransition: { name: "page", mode: "out-in" },
         head: {
             htmlAttrs: {
                 lang: "en",
@@ -53,9 +52,8 @@ export default defineNuxtConfig({
     },
     googleFonts: {
         families: {
-            Roboto: true,
-            Dosis: true,
-            Outfit: true,
+            Inter: [400, 500, 600, 700, 800],
+            'JetBrains Mono': [400, 500],
         },
     },
     nitro: {
@@ -63,6 +61,6 @@ export default defineNuxtConfig({
             routes: ["/sitemap.xml", "/rss.xml"],
         },
     },
-    css: ['~/assets/css/global.css'],
+    css: ['~/assets/css/global.scss'],
     ssr: true,
 });

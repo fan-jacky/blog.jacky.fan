@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { PayloadPostSummary } from '~/types/payload'
-import { buildArticlePath, formatPayloadDate } from '~/utils/payloadPost'
+import {
+  buildArticlePath,
+  formatPayloadDate,
+  getPrimaryPayloadTag,
+  resolvePayloadMediaAlt,
+  resolvePayloadMediaUrl,
+} from '~/utils/payloadPost'
 
 useHead({
   title: "Jacky FAN's Blog - A Personal Blog by Jacky FAN",
@@ -16,111 +22,107 @@ useHead({
   ],
 })
 
-const page = ref(1)
-const pageSize = 9
-// const fallbackFeaturedImage = 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
+const runtimeConfig = useRuntimeConfig()
 
 const { data: articles } = await useFetch<PayloadPostSummary[]>('/api/payload-posts', {
   key: 'homepage-articles',
 })
 
-const totalPages = computed(() => Math.ceil((articles.value?.length ?? 0) / pageSize))
+const featuredArticle = computed(() => articles.value?.[0] ?? null)
+const recentArticles = computed(() => (articles.value ?? []).slice(0, 6))
 
-const paginatedArticles = computed(() => {
-  const start = (page.value - 1) * pageSize
-  return (articles.value ?? []).slice(start, start + pageSize)
-})
-
-function setPage(nextPage: number) {
-  page.value = nextPage
+function getFeaturedImageUrl(article: PayloadPostSummary) {
+  return resolvePayloadMediaUrl(article.featuredImage, runtimeConfig)
 }
 
-function resolveFeaturedImageUrl(article: PayloadPostSummary) {
-  const image = article.featuredImage
-
-  if (!image || typeof image !== 'object' || !image.url) {
-    // return fallbackFeaturedImage
-    return;
-  }
-
-  try {
-    return new URL(image.url).toString()
-  } catch {
-    const config = useRuntimeConfig()
-    const base = config.public.payloadUrl || config.payloadUrl
-
-    if (!base) {
-      return image.url
-    }
-
-    try {
-      return new URL(image.url, base).toString()
-    } catch {
-      return image.url
-    }
-  }
-}
-
-function resolveFeaturedImageAlt(article: PayloadPostSummary) {
-  const image = article.featuredImage
-
-  if (image && typeof image === 'object' && image.alt?.trim()) {
-    return image.alt
-  }
-
-  return `${article.title} featured image`
+function getFeaturedImageAlt(article: PayloadPostSummary) {
+  return resolvePayloadMediaAlt(article.title, article.featuredImage)
 }
 </script>
 
 <template>
-  <div class="bg-base-300 min-h-screen">
-
+  <div class="site-wrapper">
     <Head>
       <Title>Jacky FAN's Blog - A Personal Blog by Jacky FAN</Title>
     </Head>
     <NavBar />
-    <main class="container px-4 md:px-6 lg:px-8 mx-auto py-8 min-h-screen">
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div class="col-span-4">
-          <!-- Show article list -->
-          <div>
-            <!-- for SEO -->
-            <h1 class="hidden">Jacky FAN's Blog</h1>
-
-            <div class="flex flex-wrap gap-4 justify-center">
-              <NuxtLink :to="buildArticlePath(article.slug)" v-for="article in paginatedArticles" :key="article.id"
-                class="card bg-base-100 w-full sm:w-80 shadow-sm transition-all hover:scale-105 duration-300">
-                <figure class="article-card-gradient aspect-video" v-if="article.featuredImage">
-                  <img :src="resolveFeaturedImageUrl(article)" :alt="resolveFeaturedImageAlt(article)"
-                    class="h-full w-full object-cover" />
-                </figure>
-                <div class="article-card-gradient aspect-video" v-else>
-                  <div class="flex items-center justify-center h-full w-full text-white text-3xl font-bold">
-                  </div>
-                </div>
-                <div class="card-body p-6">
-                  <h2 class="card-title">{{ article.title }}</h2>
-                  <small v-if="article.publishedDate">
-                    <IconsDateIcon class="h-[1rem] mb-1 mr-1 inline" />{{ formatPayloadDate(article.publishedDate)
-                    }}
-                  </small>
-                </div>
-              </NuxtLink>
+    <main id="main-content" class="site-main">
+      <section class="site-section blog-hero">
+        <div class="geo-circle geo-circle--lg" />
+        <div class="geo-accent" style="top:60%;right:-100px;" />
+        <div class="container">
+          <h1 class="sr-only">Jacky FAN's Blog</h1>
+          <NuxtLink v-if="featuredArticle" :to="buildArticlePath(featuredArticle.slug)" class="blog-hero__grid">
+            <div class="blog-hero__content reveal">
+              <span class="section-label">Latest Article</span>
+              <h2 class="blog-hero__title">{{ featuredArticle.title }}</h2>
+              <p v-if="featuredArticle.description" class="blog-hero__desc">{{ featuredArticle.description }}</p>
+              <div class="blog-hero__meta">
+                <span v-if="getPrimaryPayloadTag(featuredArticle.tags)" class="tag-pill">{{ getPrimaryPayloadTag(featuredArticle.tags) }}</span>
+                <span v-if="featuredArticle.publishedDate">{{ formatPayloadDate(featuredArticle.publishedDate) }}</span>
+                <span>·</span>
+                <span>{{ featuredArticle.readTime || 1 }} min read</span>
+              </div>
             </div>
+            <div class="blog-hero__image reveal">
+              <img
+                v-if="getFeaturedImageUrl(featuredArticle)"
+                :src="getFeaturedImageUrl(featuredArticle)"
+                :alt="getFeaturedImageAlt(featuredArticle)"
+                loading="eager"
+              >
+              <div v-else class="blog-hero__placeholder">{{ featuredArticle.title }}</div>
+            </div>
+          </NuxtLink>
+        </div>
+      </section>
 
+      <section class="site-section site-section--tinted">
+        <div class="geo-circle geo-circle--md" />
+        <div class="container">
+          <span class="section-label reveal">Recent Articles</span>
+          <h2 class="section-headline reveal">Latest Writing</h2>
+          <p class="section-subtitle reveal">Notes on programming, dev tooling, self-hosting, and more.</p>
+
+          <div class="article-grid reveal-stagger" style="margin-top: 3rem;">
+            <NuxtLink v-for="article in recentArticles" :key="article.id" :to="buildArticlePath(article.slug)" class="article-card">
+              <div class="article-card__image">
+                <img
+                  v-if="getFeaturedImageUrl(article)"
+                  :src="getFeaturedImageUrl(article)"
+                  :alt="getFeaturedImageAlt(article)"
+                  loading="lazy"
+                >
+                <div v-else class="article-card__placeholder">{{ article.title }}</div>
+              </div>
+              <div class="article-card__body">
+                <div class="article-card__meta">
+                  <span v-if="getPrimaryPayloadTag(article.tags)" class="tag-pill">{{ getPrimaryPayloadTag(article.tags) }}</span>
+                  <span v-if="article.publishedDate">{{ formatPayloadDate(article.publishedDate) }}</span>
+                </div>
+                <h3 class="article-card__title">{{ article.title }}</h3>
+                <p v-if="article.description" class="article-card__excerpt">{{ article.description }}</p>
+              </div>
+            </NuxtLink>
           </div>
-          <div v-if="totalPages > 1" class="my-4 px-8 pt-12 lg:pb-4 text-center">
-            <div class="join">
-              <input class="join-item btn btn-square px-3" type="radio" name="options" :aria-label="(n).toString()"
-                @click="setPage(n)" :checked="n === page" v-for="n in totalPages" :key="n" />
-            </div>
+
+          <div class="show-more reveal">
+            <NuxtLink to="/articles" class="show-more__button">View all articles →</NuxtLink>
           </div>
         </div>
-        <div>
-          <AuthorPanel />
-          <LatestPostPanel />
+      </section>
+
+      <section class="site-section site-section--dark about-blurb">
+        <div class="geo-circle geo-circle--lg" style="border-color:rgba(245,243,239,0.06);top:-80px;right:-80px;" />
+        <div class="geo-accent" style="top:auto;bottom:-100px;right:-80px;" />
+        <div class="container">
+          <div class="about-blurb__inner reveal">
+            <h2 class="about-blurb__title">Hi, I'm Jacky</h2>
+            <p class="about-blurb__text">A frontend developer based in Hong Kong. I write about web development, dev tooling, self-hosting, and the occasional hardware experiment.</p>
+            <NuxtLink to="/about" class="about-blurb__link">More about me →</NuxtLink>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
     <Footer />
   </div>

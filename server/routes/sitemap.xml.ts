@@ -1,8 +1,9 @@
 import { SitemapStream, streamToPromise } from 'sitemap'
+import type { PayloadPost } from '~/types/payload'
 import { fetchPayloadPosts } from '~/server/utils/payload'
 
 export default defineEventHandler(async (event) => {
-  let posts = []
+  let posts: PayloadPost[] = []
 
   try {
     posts = await fetchPayloadPosts(event, {

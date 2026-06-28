@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3'
 import type { PayloadCollectionResponse, PayloadPost, PayloadPostSummary } from '~/types/payload'
+import { estimateContentBlocksReadTime } from '~/utils/payloadPost'
 
 interface FetchPayloadPostsOptions {
   depth?: number
@@ -90,6 +91,8 @@ export function toPayloadPostSummary(post: PayloadPost): PayloadPostSummary {
     description: post.description,
     author: post.author,
     publishedDate: post.publishedDate,
+    tags: post.tags,
+    readTime: estimateContentBlocksReadTime(post.content ?? []),
     status: post.status,
     featuredImage: post.featuredImage,
   }

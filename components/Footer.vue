@@ -1,14 +1,12 @@
 <template>
-    <footer class="footer footer-center p-4 bg-base-200 text-base-content">
-        <div>
-            <p>
-                © 2023 ~ 2024 <a href="https://blog.jacky.fan" target="_blank" class="hover:text-blue-500">Jacky FAN's
-                    Blog</a>.
-                <a href="https://github.com/redfrogsss/nuxt-blog" class="text-blue-400 hover:text-blue-700 transition-all"
-                    target="_blank">Source
-                    Code</a> | <a href="https://blog.jacky.fan/sitemap.xml"
-                    class="text-blue-400 hover:text-blue-700">Sitemap</a>
-            </p>
+    <footer class="site-footer">
+        <div class="container site-footer__inner">
+            <span class="site-footer__info">© 2023–2026 Jacky FAN — Hong Kong</span>
+            <div class="site-footer__links">
+                <a href="https://github.com/redfrogsss" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://blog.jacky.fan" target="_blank" rel="noopener">Blog</a>
+                <a href="/sitemap.xml">Sitemap</a>
+            </div>
         </div>
     </footer>
 </template>

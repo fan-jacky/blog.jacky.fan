@@ -7,12 +7,12 @@ const isPreview = computed(() => !!previewCookie.value)
   <Teleport to="body">
     <div
       v-if="isPreview"
-      class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between bg-yellow-400 px-4 py-2 text-sm font-semibold text-black shadow-lg"
+      class="preview-banner"
     >
-      <span>⚠️ Preview Mode — this content may not be published yet</span>
+      <span class="preview-banner__text">Preview mode — this content may not be published yet.</span>
       <a
         href="/api/disable-preview"
-        class="ml-4 rounded bg-black px-3 py-1 text-white hover:bg-gray-800 transition-colors"
+        class="preview-banner__action"
       >
         Exit Preview
       </a>

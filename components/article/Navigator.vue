@@ -9,25 +9,21 @@ defineProps<{
 </script>
 
 <template>
-    <div class="flex max-w-full">
-        <NuxtLink v-if="prev" :to="buildArticlePath(prev.slug)" class="flex-shrink bg-base-100 rounded-lg shadow-md my-4 px-4 md:px-8 py-6 md:py-12 w-5/12 md:w-fit">
-            <div class="flex h-full w-full">
-                <IconsArrowLeft class="h-[1.2rem] my-auto hidden md:inline mr-4" />
-                <div class="prose max-w-full">
-                    <small>Previous Article</small>
-                    <h6 class="font-bold truncate"> {{ prev.title }} </h6>
-                </div>
-            </div>
+    <div class="article-nav">
+        <NuxtLink v-if="prev" :to="buildArticlePath(prev.slug)" class="article-nav__item">
+            <IconsArrowLeft class="article-nav__icon" />
+            <span>
+                <span class="article-nav__label">Previous Article</span>
+                <span class="article-nav__title">{{ prev.title }}</span>
+            </span>
         </NuxtLink>
-        <div class="grow" />
-        <NuxtLink v-if="next" :to="buildArticlePath(next.slug)" class="flex-shrink bg-base-100 rounded-lg shadow-md my-4 px-4 md:px-8 py-6 md:py-12 w-5/12 md:w-fit">
-            <div class="flex h-full w-full">
-                <div class="prose max-w-full">
-                    <small>Next Article</small>
-                    <h6 class="font-bold truncate"> {{ next.title }} </h6>
-                </div>
-                <IconsArrowRight class="h-[1.2rem] my-auto hidden md:inline ml-4" />
-            </div>
+        <div v-else class="article-nav__spacer" />
+        <NuxtLink v-if="next" :to="buildArticlePath(next.slug)" class="article-nav__item article-nav__item--next">
+            <span>
+                <span class="article-nav__label">Next Article</span>
+                <span class="article-nav__title">{{ next.title }}</span>
+            </span>
+            <IconsArrowRight class="article-nav__icon" />
         </NuxtLink>
     </div>
 </template>

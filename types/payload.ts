@@ -44,6 +44,8 @@ export interface PayloadPostSummary {
   description?: string | null
   author?: string | null
   publishedDate?: string | null
+  tags?: string | null
+  readTime?: number
   status: 'draft' | 'published'
   featuredImage?: PayloadMedia | number | string | null
 }
