@@ -17,6 +17,7 @@
     "rss": "^1.2.2",
     "sass-embedded": "^1.100.0",
     "sitemap": "^7.1.1",
+    "tsx": "^4.22.4",
     "vue-gtag-next": "^1.14.0"
   },
   "dependencies": {

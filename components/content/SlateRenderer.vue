@@ -56,8 +56,17 @@ function sanitizeURL(url: string | undefined): string {
   return '#'
 }
 
-function resolveMediaURL(url: string | undefined | null): string {
-  if (!url) return ''
+function resolveMediaURL(url: string | undefined | null, mediaId?: string): string {
+  if (!url) {
+    // Fallback: construct URL from media ID
+    if (mediaId) {
+      const base = config.public.payloadUrl || config.payloadUrl
+      if (base) {
+        return `${base}/api/media/file/${mediaId}`
+      }
+    }
+    return ''
+  }
 
   try {
     return new URL(url).toString()
@@ -98,7 +107,8 @@ function closeImageModal(): void {
 
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
   const media = typeof node.value === 'object' && node.value !== null ? node.value : null
-  const src = resolveMediaURL(media?.url)
+  const mediaId = media?.id as string | undefined
+  const src = resolveMediaURL(media?.url as string | undefined, mediaId)
 
   if (!src) {
     return null
