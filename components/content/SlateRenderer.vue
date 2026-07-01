@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, onMounted, onUnmounted } from 'vue'
 import type { VNodeChild } from 'vue'
 import ProseCode from '~/components/content/ProseCode.vue'
 import type { SlateLeaf, SlateNode } from '~/types/slate'
@@ -105,6 +105,20 @@ function closeImageModal(): void {
   activeImage.value = null
 }
 
+function onKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Escape') {
+    closeImageModal()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
+
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
   const media = typeof node.value === 'object' && node.value !== null ? node.value : null
   const mediaId = media?.id as string | undefined
@@ -207,15 +221,15 @@ const RenderedSlate = defineComponent({
   <div class="article-prose">
     <RenderedSlate />
   </div>
-  <div
-    v-if="activeImage"
-    class="content-modal"
-    role="dialog"
-    aria-modal="true"
-    :aria-label="activeImage.alt"
-    @click.self="closeImageModal"
-  >
-    <div class="content-modal__box">
+  <Transition name="lightbox">
+    <div
+      v-if="activeImage"
+      class="content-modal"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="activeImage.alt"
+      @click.self="closeImageModal"
+    >
       <button
         type="button"
         class="content-modal__close"
@@ -224,12 +238,14 @@ const RenderedSlate = defineComponent({
       >
         ✕
       </button>
-      <img
-        :src="activeImage.src"
-        :alt="activeImage.alt"
-        class="content-modal__image"
-      >
+      <div class="content-modal__box">
+        <img
+          :src="activeImage.src"
+          :alt="activeImage.alt"
+          class="content-modal__image"
+        >
+      </div>
+      <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
     </div>
-    <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
-  </div>
+  </Transition>
 </template>

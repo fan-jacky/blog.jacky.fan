@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import hljs from 'highlight.js/lib/common'
 import IconsCopyClipboard from '~/components/icons/CopyClipboard.vue'
 
@@ -40,8 +41,16 @@ const highlightedHtml = computed(() => {
 
 const highlightedLines = computed(() => highlightedHtml.value.split('\n'))
 
+const showToast = ref(false)
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
 async function copyToClipboard(value: string) {
   await navigator.clipboard.writeText(value)
+  showToast.value = true
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    showToast.value = false
+  }, 2000)
 }
 </script>
 
@@ -59,8 +68,15 @@ async function copyToClipboard(value: string) {
         type="button"
         @click="copyToClipboard(code ?? '')"
       >
-        <IconsCopyClipboard class="p-1" />
+        <IconsCopyClipboard />
       </button>
     </div>
+    <Teleport to="body">
+      <Transition name="copy-toast">
+        <div v-if="showToast" class="copy-toast">
+          Copied to clipboard
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>

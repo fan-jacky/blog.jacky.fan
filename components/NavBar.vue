@@ -98,7 +98,7 @@ watch(() => route.fullPath, () => {
     <header :class="['site-header', { 'is-scrolled': isScrolled }]">
         <div class="container site-header__inner">
             <NuxtLink to="/" class="site-logo" aria-label="Jacky FAN home">
-                <span class="site-logo__dot" />Jacky FAN
+                <span class="site-logo__dot" />Jacky FAN's Blog
             </NuxtLink>
             <nav class="site-nav" aria-label="Primary">
                 <div class="site-nav__links">

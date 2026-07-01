@@ -227,14 +227,27 @@
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--border);
   color: inherit;
-  transition: background 0.15s var(--ease);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent 0%, rgba(59, 92, 184, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+  }
 
   &:first-child {
     padding-top: 0;
   }
 
-  &:hover {
-    background: linear-gradient(90deg, transparent 0%, rgba(59, 92, 184, 0.03) 100%);
+  &:hover::before {
+    opacity: 1;
   }
 
   &:hover .article-list-item__title {
