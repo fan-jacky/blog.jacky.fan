@@ -1,0 +1,33 @@
+.site-footer {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__info {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    font-size: 0.875rem;
+
+    a {
+      color: var(--text-muted);
+      font-weight: 500;
+      transition: color 0.2s;
+
+      &:hover {
+        color: var(--text-primary);
+      }
+    }
+  }
+}

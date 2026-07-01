@@ -1,0 +1,51 @@
+@import 'highlight.js/styles/github-dark.css';
+
+:root {
+  --bg-primary: #faf9f5;
+  --bg-secondary: #f3f1eb;
+  --bg-tertiary: #eae6dd;
+  --bg-tint: #f7f4f0;
+  --bg-dark: #1f1d1a;
+  --bg-dark-soft: #2b2824;
+  --text-primary: #1f1d1a;
+  --text-body: #4a4742;
+  --text-muted: #69655e;
+  --text-inverse: #f5f3ef;
+  --accent: #3b5cb8;
+  --accent-hover: #2d488f;
+  --accent-light: #eef1f8;
+  --accent-glow: rgba(59, 92, 184, 0.12);
+  --tag-bg: #f0ede6;
+  --tag-text: #5c5548;
+  --border: #e8e4dc;
+  --border-soft: #ede9e2;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --max-width: 1280px;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+html[data-theme='dark'] {
+  --bg-primary: #141210;
+  --bg-secondary: #1c1916;
+  --bg-tertiary: #262320;
+  --bg-tint: #181613;
+  --bg-dark: #f5f3ef;
+  --bg-dark-soft: #e8e4dc;
+  --text-primary: #f0ede6;
+  --text-body: #c4bfb5;
+  --text-muted: #8c867a;
+  --text-inverse: #1f1d1a;
+  --accent: #8ba8e0;
+  --accent-hover: #a0baf0;
+  --accent-light: rgba(139, 168, 224, 0.10);
+  --accent-glow: rgba(139, 168, 224, 0.10);
+  --tag-bg: #262320;
+  --tag-text: #a0988a;
+  --border: #2b2824;
+  --border-soft: #24211e;
+}

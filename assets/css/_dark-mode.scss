@@ -1,0 +1,37 @@
+html[data-theme='dark'] .site-section--dark {
+  .section-label {
+    color: rgba(31, 29, 26, 0.7) !important;
+  }
+
+  .section-subtitle {
+    color: rgba(31, 29, 26, 0.7);
+  }
+}
+
+html[data-theme='dark'] .geo-circle--lg {
+  border-color: rgba(139, 168, 224, 0.06);
+}
+
+html[data-theme='dark'] .geo-circle--md {
+  border-color: rgba(139, 168, 224, 0.08);
+}
+
+html[data-theme='dark'] .geo-circle--sm {
+  background: rgba(139, 168, 224, 0.04);
+}
+
+html[data-theme='dark'] .article-list-item:hover {
+  background: linear-gradient(90deg, transparent 0%, rgba(139, 168, 224, 0.03) 100%);
+}
+
+html[data-theme='dark'] .article-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme='dark'] .article-listing__input:focus {
+  box-shadow: 0 0 0 3px rgba(139, 168, 224, 0.10);
+}
+
+html[data-theme='dark'] .article-listing__select {
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237a7670' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
