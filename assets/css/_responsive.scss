@@ -83,7 +83,11 @@
   }
 
   .site-nav__links {
-    gap: 0.9rem;
+    display: none;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
   }
 
   .article-related,
@@ -167,10 +171,6 @@
   }
 
   .site-nav {
-    gap: 0.75rem;
-  }
-
-  .site-nav__links {
     gap: 0.75rem;
   }
 

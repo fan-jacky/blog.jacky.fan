@@ -1,0 +1,135 @@
+// ==============================================
+//   Mobile navigation — full-screen overlay
+// ==============================================
+
+@keyframes mobileNavFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav-toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  padding: 0;
+
+  &:hover {
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+  }
+
+  span {
+    display: block;
+    width: 14px;
+    height: 1.5px;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+  }
+
+  &--open {
+    span:nth-child(1) {
+      transform: translateY(4.5px) rotate(45deg);
+    }
+
+    span:nth-child(2) {
+      opacity: 0;
+    }
+
+    span:nth-child(3) {
+      transform: translateY(-4.5px) rotate(-45deg);
+    }
+  }
+}
+
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  background: rgba(250, 249, 245, 0.98);
+  backdrop-filter: blur(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+
+  &--open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 201;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+
+    &:hover {
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0 2rem;
+  }
+
+  &__link {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    opacity: 0;
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+    transition: color 0.2s var(--ease);
+
+    &:hover,
+    &--active {
+      color: var(--text-primary);
+    }
+  }
+
+  &--open &__link {
+    animation: mobileNavFadeSlideIn 0.4s var(--ease) forwards;
+  }
+}
+
+html[data-theme='dark'] .mobile-nav-overlay {
+  background: rgba(20, 18, 16, 0.98);
+}

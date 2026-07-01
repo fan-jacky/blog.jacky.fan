@@ -19,6 +19,9 @@
 // Site header, navigation, theme toggle
 @use 'header';
 
+// Mobile navigation overlay
+@use 'mobile-nav';
+
 // Decorative elements (geo shapes, reveal animations)
 @use 'decorations';
 
