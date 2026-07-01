@@ -3,10 +3,10 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@11
 
 # Install dependencies (including devDependencies needed for the build)
-COPY package.json pnpm-lock.yaml tsconfig.json next.config.ts next-env.d.ts ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json next.config.ts next-env.d.ts ./
 COPY src ./src
 RUN pnpm install --frozen-lockfile
 
@@ -21,7 +21,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3001
 
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@11
 
 # Copy only what is needed to run the app
 COPY --from=builder /app/.next ./.next
