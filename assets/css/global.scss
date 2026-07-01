@@ -4,43 +4,44 @@
 // ==============================================
 
 // Vendor
-@import 'highlight.js/styles/github-dark.css';
+@use 'highlight.js/styles/github-dark.css';
+@use 'locomotive-scroll/dist/locomotive-scroll.css';
 
 // Design tokens (CSS custom properties)
-@import 'tokens';
+@use 'tokens';
 
 // Reset & base element styles
-@import 'reset';
+@use 'reset';
 
 // Layout primitives (containers, sections)
-@import 'layout';
+@use 'layout';
 
 // Site header, navigation, theme toggle
-@import 'header';
+@use 'header';
 
 // Decorative elements (geo shapes, reveal animations)
-@import 'decorations';
+@use 'decorations';
 
 // Homepage hero section
-@import 'hero';
+@use 'hero';
 
 // Article cards, grids, listings
-@import 'articles';
+@use 'articles';
 
 // Dark mode overrides
-@import 'dark-mode';
+@use 'dark-mode';
 
 // About page
-@import 'about';
+@use 'about';
 
 // Article detail page (prose, author, related, nav)
-@import 'article-detail';
+@use 'article-detail';
 
 // Site footer
-@import 'footer';
+@use 'footer';
 
 // Reusable components (preview banner, modal, code block)
-@import 'components';
+@use 'components';
 
 // Responsive media queries
-@import 'responsive';
+@use 'responsive';

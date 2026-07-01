@@ -68,7 +68,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="site-shell">
+  <div class="site-shell" data-scroll-container>
     <a href="#main-content" class="skip-link">Skip to content</a>
     <NuxtPage />
   </div>

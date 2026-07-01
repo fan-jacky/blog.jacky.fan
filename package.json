@@ -23,6 +23,7 @@
     "@payloadcms/live-preview-vue": "^3.85.0",
     "@tailwindcss/typography": "^0.5.9",
     "daisyui": "^3.1.0",
-    "highlight.js": "^11.11.1"
+    "highlight.js": "^11.11.1",
+    "locomotive-scroll": "^5.0.1"
   }
 }
