@@ -142,7 +142,7 @@ function getImageAlt(article: PayloadPostSummary) {
             >
               <div class="article-list-item__image">
                 <img v-if="getImageUrl(article)" :src="getImageUrl(article)" :alt="getImageAlt(article)" loading="lazy">
-                <div v-else class="article-list-item__placeholder">{{ article.title }}</div>
+                <div v-else class="article-list-item__placeholder"></div>
               </div>
               <div class="article-list-item__content">
                 <div class="article-list-item__meta">

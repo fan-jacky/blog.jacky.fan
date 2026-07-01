@@ -32,7 +32,6 @@ const relatedPosts = computed(() => props.relatedPosts ?? [])
                 <img :src="heroImageUrl" :alt="heroImageAlt">
             </div>
             <div v-else class="article-page__hero-image article-page__hero-placeholder">
-                {{ post.title }}
             </div>
         </div>
 
@@ -95,7 +94,7 @@ const relatedPosts = computed(() => props.relatedPosts ?? [])
                                 :alt="resolvePayloadMediaAlt(relatedPost.title, relatedPost.featuredImage)"
                                 loading="lazy"
                             >
-                            <div v-else class="article-card__placeholder">{{ relatedPost.title }}</div>
+                            <div v-else class="article-card__placeholder"></div>
                         </div>
                         <div class="article-card__body">
                             <div class="article-card__meta">

@@ -71,7 +71,7 @@ function getFeaturedImageAlt(article: PayloadPostSummary) {
                 :alt="getFeaturedImageAlt(featuredArticle)"
                 loading="eager"
               >
-              <div v-else class="blog-hero__placeholder">{{ featuredArticle.title }}</div>
+              <div v-else class="blog-hero__placeholder"></div>
             </div>
           </NuxtLink>
         </div>
@@ -93,7 +93,7 @@ function getFeaturedImageAlt(article: PayloadPostSummary) {
                   :alt="getFeaturedImageAlt(article)"
                   loading="lazy"
                 >
-                <div v-else class="article-card__placeholder">{{ article.title }}</div>
+                <div v-else class="article-card__placeholder"></div>
               </div>
               <div class="article-card__body">
                 <div class="article-card__meta">
