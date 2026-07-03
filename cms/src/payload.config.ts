@@ -1,6 +1,5 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import dotenv from 'dotenv'
 import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
@@ -11,8 +10,6 @@ import Users from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-
-dotenv.config({ path: path.resolve(dirname, '../.env') })
 
 function parseAllowedOrigins(...values: Array<string | undefined>) {
   return values
