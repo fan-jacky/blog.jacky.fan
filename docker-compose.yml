@@ -22,6 +22,8 @@ services:
     build:
       context: ./cms
       dockerfile: Dockerfile
+      args:
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET:-change-me}
     restart: unless-stopped
     depends_on:
       mongodb:

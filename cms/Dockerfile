@@ -3,6 +3,10 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
+# Build-time secret (passed via --build-arg or docker compose build args)
+ARG PAYLOAD_SECRET
+ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
+
 RUN npm install -g pnpm@11
 
 # Install dependencies (including devDependencies needed for the build)
