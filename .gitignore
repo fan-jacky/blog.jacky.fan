@@ -16,3 +16,4 @@ cms/src/payload-types.ts
 cms/src/generated-schema.graphql
 
 .github/copilot-instructions.md
+cms/src/secret.ts
