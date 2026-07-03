@@ -30,6 +30,7 @@ const allowedOrigins = parseAllowedOrigins(
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
+  cookiePrefix: 'payload',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: Users.slug,
@@ -78,9 +79,7 @@ export default buildConfig({
   cors: allowedOrigins.length > 0
     ? allowedOrigins
     : ['http://localhost:3000', 'http://localhost:3001'],
-  csrf: allowedOrigins.length > 0
-    ? allowedOrigins
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  csrf: [],
   upload: {
     limits: {
       fileSize: 10000000, // 10 MB

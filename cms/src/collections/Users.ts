@@ -4,6 +4,10 @@ const Users: CollectionConfig = {
   slug: 'users',
   auth: {
     useAPIKey: true,
+    cookies: {
+      sameSite: 'Lax',
+      secure: false,
+    },
   },
   admin: {
     useAsTitle: 'email',

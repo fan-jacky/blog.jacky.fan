@@ -10,8 +10,13 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json next.config.t
 COPY src ./src
 RUN pnpm install --frozen-lockfile
 
+# Patch Form component: fix client-side navigation in Docker
+RUN find node_modules -path '*/@payloadcms/ui/dist/forms/Form/index.js' -exec sed -i 's|startRouteTransition(() => router.push(redirect));|startRouteTransition(() => { setTimeout(() => { window.location.href = redirect; }, 100); });|' {} \;
+
 # Copy source and build
 COPY . .
+# Force clean build - remove all caches
+RUN rm -rf .next .turbo node_modules/.cache
 RUN pnpm run build
 
 # ─── Production stage ─────────────────────────────────────────────────────────
