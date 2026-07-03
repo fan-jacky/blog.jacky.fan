@@ -30,7 +30,6 @@ const allowedOrigins = parseAllowedOrigins(
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
-  cookiePrefix: 'payload',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: Users.slug,
