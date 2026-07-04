@@ -27,7 +27,7 @@ const allowedOrigins = parseAllowedOrigins(
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
   admin: {
     user: Users.slug,
     meta: {

@@ -61,7 +61,7 @@ Edit `cms/.env` and fill in:
 |-----------------------------|---------------------------------------------------------------------|
 | `PAYLOAD_SECRET`            | A long random string used to sign JWTs — keep this secret          |
 | `PREVIEW_SECRET`            | Must match `PREVIEW_SECRET` in the blog `.env`                     |
-| `PAYLOAD_PUBLIC_SERVER_URL` | Public URL where the CMS admin is accessible, e.g. `https://cms.example.com` |
+| `PAYLOAD_PUBLIC_SERVER_URL` | Public URL where the CMS admin is accessible, e.g. `https://cms.example.com`. Leave blank for local/LAN development to use the current request origin. |
 | `PAYLOAD_PUBLIC_SITE_URL`   | Public URL of the blog, e.g. `https://blog.example.com`            |
 
 Generate strong secrets with:
