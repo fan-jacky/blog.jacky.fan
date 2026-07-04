@@ -291,12 +291,14 @@ const RenderedSlate = defineComponent({
           @touchstart.passive="onTouchStart"
           @touchmove="onTouchMove"
         >
-          <img
-            :src="activeImage.src"
-            :alt="activeImage.alt"
-            class="content-modal__image"
-            :style="{ transform: `scale(${zoom})` }"
-          >
+          <div class="content-modal__image-wrap">
+            <img
+              :src="activeImage.src"
+              :alt="activeImage.alt"
+              class="content-modal__image"
+              :style="{ transform: `scale(${zoom})` }"
+            >
+          </div>
         </div>
         <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
       </div>
