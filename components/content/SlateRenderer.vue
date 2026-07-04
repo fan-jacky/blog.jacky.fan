@@ -119,11 +119,6 @@ function openImageModal(image: { alt: string, src: string }): void {
   panX.value = 0
   panY.value = 0
   document.body.style.overflow = 'hidden'
-  // Stop Locomotive Scroll so wheel events reach our handler
-  const { $locomotiveScroll } = useNuxtApp()
-  if ($locomotiveScroll) {
-    ($locomotiveScroll as { stop?: () => void }).stop?.()
-  }
 }
 
 function closeImageModal(): void {
@@ -132,15 +127,13 @@ function closeImageModal(): void {
   panX.value = 0
   panY.value = 0
   document.body.style.overflow = ''
-  // Restart Locomotive Scroll
-  const { $locomotiveScroll } = useNuxtApp()
-  if ($locomotiveScroll) {
-    ($locomotiveScroll as { start?: () => void }).start?.()
-  }
 }
 
-function onWheel(event: WheelEvent): void {
+// Window-level wheel handler with capture phase — beats Locomotive Scroll
+function onWheelCapture(event: WheelEvent): void {
+  if (!activeImage.value) return
   event.preventDefault()
+  event.stopPropagation()
   const delta = event.deltaY > 0 ? -0.1 : 0.1
   zoom.value = clampZoom(zoom.value + delta)
 }
@@ -152,9 +145,11 @@ function onTouchStart(event: TouchEvent): void {
   }
 }
 
-function onTouchMove(event: TouchEvent): void {
+function onTouchMoveCapture(event: TouchEvent): void {
+  if (!activeImage.value) return
   if (event.touches.length === 2) {
     event.preventDefault()
+    event.stopPropagation()
     const currentDistance = getTouchDistance(event.touches)
     const scale = currentDistance / initialPinchDistance
     zoom.value = clampZoom(initialPinchZoom * scale)
@@ -199,43 +194,34 @@ function onKeydown(event: KeyboardEvent): void {
   }
 }
 
+// Attach capture-phase listeners on window to beat Locomotive Scroll
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
-})
-
-// Watch modal open/close to attach wheel/touch listeners directly to box element
-// with { passive: false } so preventDefault() actually works
-watch(boxRef, (el) => {
-  if (el) {
-    el.addEventListener('wheel', onWheel, { passive: false })
-    el.addEventListener('touchmove', onTouchMove, { passive: false })
-    el.addEventListener('mousedown', onMouseDown)
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
-  }
-})
-
-watch(activeImage, (val) => {
-  if (!val && boxRef.value) {
-    // Clean up if needed (listeners stay on element until unmounted)
-  }
+  window.addEventListener('wheel', onWheelCapture, { capture: true, passive: false })
+  window.addEventListener('touchmove', onTouchMoveCapture, { capture: true, passive: false })
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('wheel', onWheelCapture, { capture: true })
+  window.removeEventListener('touchmove', onTouchMoveCapture, { capture: true })
   document.body.style.overflow = ''
-  // Restart LS if component unmounts while modal is open
-  const { $locomotiveScroll } = useNuxtApp()
-  if ($locomotiveScroll) {
-    ($locomotiveScroll as { start?: () => void }).start?.()
-  }
-  if (boxRef.value) {
-    boxRef.value.removeEventListener('wheel', onWheel)
-    boxRef.value.removeEventListener('touchmove', onTouchMove)
-    boxRef.value.removeEventListener('mousedown', onMouseDown)
-  }
   document.removeEventListener('mousemove', onMouseMove)
   document.removeEventListener('mouseup', onMouseUp)
+})
+
+// Attach box-level listeners when box element is available
+watch(boxRef, (el, _, cleanup) => {
+  if (!el) return
+  el.addEventListener('mousedown', onMouseDown)
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
+
+  cleanup(() => {
+    el.removeEventListener('mousedown', onMouseDown)
+    document.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('mouseup', onMouseUp)
+  })
 })
 
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
@@ -334,6 +320,11 @@ const RenderedSlate = defineComponent({
     return () => renderedNodes.value
   },
 })
+
+const imageStyle = computed(() => ({
+  transform: `scale(${zoom.value})`,
+  userSelect: zoom.value > 1 ? 'none' : undefined,
+} as Record<string, string | undefined>))
 </script>
 
 <template>
@@ -374,7 +365,7 @@ const RenderedSlate = defineComponent({
               class="content-modal__image"
               draggable="false"
               @dragstart.prevent
-              :style="{ transform: `scale(${zoom})` }"
+              :style="imageStyle"
             >
           </div>
         </div>
