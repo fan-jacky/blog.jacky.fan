@@ -14,23 +14,31 @@ withDefaults(
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-200 font-outfit text-base-content">
+  <div class="site-wrapper">
     <NavBar />
-
-    <main class="mx-auto flex min-h-[calc(100vh-9rem)] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
-      <p class="text-sm font-semibold uppercase tracking-[0.4em] text-primary">Error</p>
-      <h1 class="mt-4 text-6xl font-black text-primary md:text-8xl">{{ statusCode }}</h1>
-      <p class="mt-6 text-2xl font-semibold md:text-3xl">{{ statusMessage }}</p>
-      <p class="mt-4 max-w-xl text-base-content/80">
-        {{ description }}
-      </p>
-      <div class="mt-8">
-        <NuxtLink to="/" class="btn btn-primary">
-          Back to home
-        </NuxtLink>
-      </div>
+    <main id="main-content" class="site-main">
+      <section class="site-section" style="text-align:center">
+        <div class="geo-circle geo-circle--lg" style="top:-80px;right:-80px;" />
+        <div class="geo-circle geo-circle--sm" style="bottom:10%;left:8%;" />
+        <div class="container">
+          <span class="section-label reveal">Error</span>
+          <h1 class="section-headline reveal" style="font-size:clamp(4rem,10vw,8rem);line-height:1;margin-bottom:0.5rem">
+            {{ statusCode }}
+          </h1>
+          <p class="section-subtitle reveal" style="max-width:480px;margin:0 auto 1rem">
+            {{ statusMessage }}
+          </p>
+          <p class="reveal" style="max-width:480px;margin:0 auto 2rem;color:var(--text-muted);font-size:1rem;line-height:1.6">
+            {{ description }}
+          </p>
+          <div class="reveal">
+            <NuxtLink to="/" class="show-more__button">
+              Back to home
+            </NuxtLink>
+          </div>
+        </div>
+      </section>
     </main>
-
     <Footer />
   </div>
 </template>
