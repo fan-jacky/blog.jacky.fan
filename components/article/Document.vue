@@ -27,7 +27,7 @@ const relatedPosts = computed(() => props.relatedPosts ?? [])
 
 <template>
     <article>
-        <div class="article-page__hero">
+        <div class="article-page__hero reveal">
             <div v-if="heroImageUrl" class="article-page__hero-image">
                 <img :src="heroImageUrl" :alt="heroImageAlt">
             </div>
@@ -35,7 +35,7 @@ const relatedPosts = computed(() => props.relatedPosts ?? [])
             </div>
         </div>
 
-        <header class="article-page__header">
+        <header class="article-page__header reveal">
             <span v-if="primaryTag" class="section-label">{{ primaryTag }}</span>
             <div v-if="post.status === 'draft'" class="tag-pill">Draft</div>
             <h1 class="article-page__title">{{ post.title }}</h1>
@@ -49,7 +49,7 @@ const relatedPosts = computed(() => props.relatedPosts ?? [])
             </div>
         </header>
 
-        <div class="article-page__body">
+        <div class="article-page__body reveal">
             <ContentBlocksRenderer v-if="hasContent" :blocks="contentBlocks" />
             <p v-else class="article-page__empty">No content yet.</p>
 

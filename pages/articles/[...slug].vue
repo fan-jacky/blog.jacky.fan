@@ -87,9 +87,9 @@ useHead(() => ({
             <section class="site-section site-section--article">
                 <div class="geo-circle geo-circle--sm" style="top:8%;right:5%;" />
                 <div class="container">
-                    <NuxtLink to="/articles" class="article-page__back-link">All articles</NuxtLink>
+                    <NuxtLink to="/articles" class="article-page__back-link reveal">All articles</NuxtLink>
                     <ArticleDocument v-if="post" :post="post" :related-posts="relatedPosts" />
-                    <ArticleNavigator :prev="prevPost" :next="nextPost" />
+                    <ArticleNavigator :prev="prevPost" :next="nextPost" class="reveal" />
                 </div>
             </section>
         </main>
