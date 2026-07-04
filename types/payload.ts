@@ -60,6 +60,26 @@ export interface PayloadAbout {
   body?: SlateNode[]
 }
 
+export interface SiteLink {
+  id?: string | null
+  label: string
+  linkType: 'internal' | 'external'
+  internalPath?: string | null
+  externalUrl?: string | null
+}
+
+export interface PayloadSiteSettings {
+  navLinks?: SiteLink[] | null
+  footerCopyright?: string | null
+  footerLinks?: SiteLink[] | null
+  homeAbout?: {
+    title?: string | null
+    body?: string | null
+    linkText?: string | null
+    linkUrl?: string | null
+  } | null
+}
+
 export interface PayloadCollectionResponse<T> {
   docs: T[]
 }

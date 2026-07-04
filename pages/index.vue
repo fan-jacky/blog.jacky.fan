@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PayloadPostSummary } from '~/types/payload'
+import type { PayloadPostSummary, PayloadSiteSettings } from '~/types/payload'
 import {
   buildArticlePath,
   formatPayloadDate,
@@ -23,10 +23,18 @@ useHead({
 })
 
 const runtimeConfig = useRuntimeConfig()
+const payloadUrl = runtimeConfig.payloadUrl || runtimeConfig.public.payloadUrl
 
 const { data: articles } = await useFetch<PayloadPostSummary[]>('/api/payload-posts', {
   key: 'homepage-articles',
 })
+
+const { data: settings } = await useAsyncData<PayloadSiteSettings>(
+  'site-settings-home',
+  () => $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`),
+)
+
+const homeAbout = computed(() => settings.value?.homeAbout)
 
 const featuredArticle = computed(() => articles.value?.[0] ?? null)
 const recentArticles = computed(() => (articles.value ?? []).slice(0, 6))
@@ -117,9 +125,9 @@ function getFeaturedImageAlt(article: PayloadPostSummary) {
         <div class="geo-accent" style="top:auto;bottom:-100px;right:-80px;" />
         <div class="container">
           <div class="about-blurb__inner reveal">
-            <h2 class="about-blurb__title">Hi, I'm Jacky</h2>
-            <p class="about-blurb__text">A frontend developer based in Hong Kong. I write about web development, dev tooling, self-hosting, and the occasional hardware experiment.</p>
-            <NuxtLink to="/about" class="about-blurb__link">More about me →</NuxtLink>
+            <h2 class="about-blurb__title">{{ homeAbout?.title || "Hi, I'm Jacky" }}</h2>
+            <p class="about-blurb__text">{{ homeAbout?.body || 'A frontend developer based in Hong Kong. I write about web development, dev tooling, self-hosting, and the occasional hardware experiment.' }}</p>
+            <NuxtLink :to="homeAbout?.linkUrl || '/about'" class="about-blurb__link">{{ homeAbout?.linkText || 'More about me →' }}</NuxtLink>
           </div>
         </div>
       </section>
