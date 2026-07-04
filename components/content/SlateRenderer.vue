@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const config = useRuntimeConfig()
 const activeImage = ref<{ alt: string, src: string } | null>(null)
+const isZoomed = ref(false)
 
 function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
@@ -45,12 +46,10 @@ function sanitizeURL(url: string | undefined): string {
   if (!url) return '#'
   try {
     const parsed = new URL(url)
-    // Only allow safe protocols
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
       return url
     }
   } catch {
-    // relative paths are fine
     if (/^\//.test(url)) return url
   }
   return '#'
@@ -58,7 +57,6 @@ function sanitizeURL(url: string | undefined): string {
 
 function resolveMediaURL(url: string | undefined | null, mediaId?: string): string {
   if (!url) {
-    // Fallback: construct URL from media ID
     if (mediaId) {
       const base = config.public.payloadUrl || config.payloadUrl
       if (base) {
@@ -99,10 +97,18 @@ function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
 
 function openImageModal(image: { alt: string, src: string }): void {
   activeImage.value = image
+  isZoomed.value = false
+  document.body.style.overflow = 'hidden'
 }
 
 function closeImageModal(): void {
   activeImage.value = null
+  isZoomed.value = false
+  document.body.style.overflow = ''
+}
+
+function toggleZoom(): void {
+  isZoomed.value = !isZoomed.value
 }
 
 function onKeydown(event: KeyboardEvent): void {
@@ -117,6 +123,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
 })
 
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
@@ -221,31 +228,38 @@ const RenderedSlate = defineComponent({
   <div class="article-prose">
     <RenderedSlate />
   </div>
-  <Transition name="lightbox">
-    <div
-      v-if="activeImage"
-      class="content-modal"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="activeImage.alt"
-      @click.self="closeImageModal"
-    >
-      <button
-        type="button"
-        class="content-modal__close"
-        aria-label="Close image preview"
-        @click="closeImageModal"
+  <Teleport to="body">
+    <Transition name="lightbox">
+      <div
+        v-if="activeImage"
+        class="content-modal"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="activeImage.alt"
+        @click.self="closeImageModal"
       >
-        ✕
-      </button>
-      <div class="content-modal__box">
-        <img
-          :src="activeImage.src"
-          :alt="activeImage.alt"
-          class="content-modal__image"
+        <button
+          type="button"
+          class="content-modal__close"
+          aria-label="Close image preview"
+          @click="closeImageModal"
         >
+          ✕
+        </button>
+        <div
+          class="content-modal__box"
+          :class="{ 'content-modal__box--zoomed': isZoomed }"
+          @click="toggleZoom"
+        >
+          <img
+            :src="activeImage.src"
+            :alt="activeImage.alt"
+            class="content-modal__image"
+            :class="{ 'content-modal__image--zoomed': isZoomed }"
+          >
+        </div>
+        <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
       </div>
-      <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
-    </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
