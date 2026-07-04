@@ -11,7 +11,12 @@ const props = defineProps<{
 
 const config = useRuntimeConfig()
 const activeImage = ref<{ alt: string, src: string } | null>(null)
-const isZoomed = ref(false)
+const zoom = ref(1)
+const boxRef = ref<HTMLElement | null>(null)
+
+// Touch pinch state
+let initialPinchDistance = 0
+let initialPinchZoom = 1
 
 function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
   return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
@@ -95,20 +100,52 @@ function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
     .join('')
 }
 
+function clampZoom(value: number): number {
+  return Math.max(0.5, Math.min(5, value))
+}
+
 function openImageModal(image: { alt: string, src: string }): void {
   activeImage.value = image
-  isZoomed.value = false
+  zoom.value = 1
   document.body.style.overflow = 'hidden'
 }
 
 function closeImageModal(): void {
   activeImage.value = null
-  isZoomed.value = false
+  zoom.value = 1
   document.body.style.overflow = ''
 }
 
-function toggleZoom(): void {
-  isZoomed.value = !isZoomed.value
+function onWheel(event: WheelEvent): void {
+  event.preventDefault()
+  const delta = event.deltaY > 0 ? -0.1 : 0.1
+  zoom.value = clampZoom(zoom.value + delta)
+}
+
+function onTouchStart(event: TouchEvent): void {
+  if (event.touches.length === 2) {
+    initialPinchDistance = getTouchDistance(event.touches)
+    initialPinchZoom = zoom.value
+  }
+}
+
+function onTouchMove(event: TouchEvent): void {
+  if (event.touches.length === 2) {
+    event.preventDefault()
+    const currentDistance = getTouchDistance(event.touches)
+    const scale = currentDistance / initialPinchDistance
+    zoom.value = clampZoom(initialPinchZoom * scale)
+  }
+}
+
+function getTouchDistance(touches: TouchList): number {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function onDoubleClick(): void {
+  zoom.value = zoom.value > 1 ? 1 : 2
 }
 
 function onKeydown(event: KeyboardEvent): void {
@@ -247,15 +284,18 @@ const RenderedSlate = defineComponent({
           ✕
         </button>
         <div
+          ref="boxRef"
           class="content-modal__box"
-          :class="{ 'content-modal__box--zoomed': isZoomed }"
-          @click="toggleZoom"
+          @wheel.passive="onWheel"
+          @dblclick="onDoubleClick"
+          @touchstart.passive="onTouchStart"
+          @touchmove="onTouchMove"
         >
           <img
             :src="activeImage.src"
             :alt="activeImage.alt"
             class="content-modal__image"
-            :class="{ 'content-modal__image--zoomed': isZoomed }"
+            :style="{ transform: `scale(${zoom})` }"
           >
         </div>
         <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
