@@ -8,7 +8,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     ports:
-      - "27027:27017"
+      - "27019:27017"
     networks:
       - blog_network
     healthcheck:
@@ -32,11 +32,11 @@ services:
       - ./cms/.env
     environment:
       DATABASE_URI: mongodb://mongodb:27017/blog-cms
-      PORT: "4101"
+      PORT: "4201"
     volumes:
       - cms_uploads:/app/uploads
     ports:
-      - "4101:4101"
+      - "4201:4201"
     networks:
       - blog_network
 
@@ -51,11 +51,11 @@ services:
     env_file:
       - .env
     environment:
-      NUXT_PAYLOAD_URL: http://cms:4101
-      PAYLOAD_URL: http://cms:4101
-      NUXT_PUBLIC_PAYLOAD_URL: ${NUXT_PUBLIC_PAYLOAD_URL:-http://localhost:4101}
+      NUXT_PAYLOAD_URL: http://cms:4201
+      PAYLOAD_URL: http://cms:4201
+      NUXT_PUBLIC_PAYLOAD_URL: ${NUXT_PUBLIC_PAYLOAD_URL:-http://localhost:4201}
     ports:
-      - "4100:4100"
+      - "4200:4200"
     networks:
       - blog_network
 

@@ -7,7 +7,6 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
-import { PAYLOAD_SECRET } from './secret'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,7 +26,7 @@ const allowedOrigins = parseAllowedOrigins(
 )
 
 export default buildConfig({
-  secret: PAYLOAD_SECRET,
+  secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: Users.slug,
