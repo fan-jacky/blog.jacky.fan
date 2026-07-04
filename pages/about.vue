@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { PayloadAbout } from '~/types/payload'
+
 useHead({
   title: 'About — Jacky FAN',
   meta: [
@@ -8,6 +10,10 @@ useHead({
     },
   ],
 })
+
+const about = await $fetch<PayloadAbout>('/api/payload-about')
+
+const bodyNodes = computed(() => about?.body ?? [])
 </script>
 
 <template>
@@ -22,17 +28,7 @@ useHead({
           <p class="section-subtitle reveal">A frontend developer based in Hong Kong.</p>
 
           <div class="about-page__body reveal">
-            <p>I'm <strong>Jacky FAN</strong> — a frontend developer based in Hong Kong. I build things for the web, mostly with TypeScript, React, and Vue.</p>
-            <p>This blog is where I write about things I'm learning, building, or thinking about. Topics tend to orbit around web development, dev tooling, self-hosting, and the occasional hardware experiment.</p>
-
-            <h2>Elsewhere</h2>
-            <ul>
-              <li><a href="https://jacky.fan" target="_blank" rel="noopener">Portfolio — jacky.fan</a></li>
-              <li><a href="https://github.com/redfrogsss" target="_blank" rel="noopener">GitHub — @redfrogsss</a></li>
-            </ul>
-
-            <h2>Colophon</h2>
-            <p>This site is built with <strong>Nuxt 3</strong>. Content is managed through <strong>Payload CMS</strong>. The type system stays aligned through generated Payload types, and the frontend now follows the same editorial design language as the new prototype.</p>
+            <SlateRenderer v-if="bodyNodes.length > 0" :nodes="bodyNodes" />
           </div>
         </div>
       </section>
