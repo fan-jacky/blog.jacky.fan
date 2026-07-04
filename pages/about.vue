@@ -14,12 +14,16 @@ useHead({
 const config = useRuntimeConfig()
 const payloadUrl = config.payloadUrl || config.public.payloadUrl
 
-// Clear any stale cached data before fetching
-clearNuxtData('about-page')
-
-const { data: about } = await useAsyncData<PayloadAbout>('about-page', () =>
-  $fetch<PayloadAbout>(`${payloadUrl}/api/globals/about`),
+const { data: about, refresh } = await useAsyncData<PayloadAbout>(
+  'about-page',
+  () => $fetch<PayloadAbout>(`${payloadUrl}/api/globals/about`),
+  { server: true },
 )
+
+// Force refresh on every client-side mount
+if (import.meta.client) {
+  await refresh()
+}
 
 const bodyNodes = computed(() => about.value?.body ?? [])
 </script>
