@@ -22,6 +22,13 @@ export default defineNuxtConfig({
             htmlAttrs: {
                 lang: "en",
             },
+            meta: [
+                { property: 'og:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og.png' },
+                { property: 'og:image:width', content: '1200' },
+                { property: 'og:image:height', content: '630' },
+                { name: 'twitter:card', content: 'summary_large_image' },
+                { name: 'twitter:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og.png' },
+            ],
         },
     },
     modules: [
