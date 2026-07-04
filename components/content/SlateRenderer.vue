@@ -119,6 +119,11 @@ function openImageModal(image: { alt: string, src: string }): void {
   panX.value = 0
   panY.value = 0
   document.body.style.overflow = 'hidden'
+  // Stop Locomotive Scroll so wheel events reach our handler
+  const { $locomotiveScroll } = useNuxtApp()
+  if ($locomotiveScroll) {
+    ($locomotiveScroll as { stop?: () => void }).stop?.()
+  }
 }
 
 function closeImageModal(): void {
@@ -127,6 +132,11 @@ function closeImageModal(): void {
   panX.value = 0
   panY.value = 0
   document.body.style.overflow = ''
+  // Restart Locomotive Scroll
+  const { $locomotiveScroll } = useNuxtApp()
+  if ($locomotiveScroll) {
+    ($locomotiveScroll as { start?: () => void }).start?.()
+  }
 }
 
 function onWheel(event: WheelEvent): void {
@@ -214,6 +224,11 @@ watch(activeImage, (val) => {
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
   document.body.style.overflow = ''
+  // Restart LS if component unmounts while modal is open
+  const { $locomotiveScroll } = useNuxtApp()
+  if ($locomotiveScroll) {
+    ($locomotiveScroll as { start?: () => void }).start?.()
+  }
   if (boxRef.value) {
     boxRef.value.removeEventListener('wheel', onWheel)
     boxRef.value.removeEventListener('touchmove', onTouchMove)
@@ -357,6 +372,8 @@ const RenderedSlate = defineComponent({
               :src="activeImage.src"
               :alt="activeImage.alt"
               class="content-modal__image"
+              draggable="false"
+              @dragstart.prevent
               :style="{ transform: `scale(${zoom})` }"
             >
           </div>
