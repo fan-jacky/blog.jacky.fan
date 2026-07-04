@@ -29,10 +29,15 @@ const { data: articles } = await useFetch<PayloadPostSummary[]>('/api/payload-po
   key: 'homepage-articles',
 })
 
-const { data: settings } = await useAsyncData<PayloadSiteSettings>(
-  'site-settings-home',
-  () => $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`),
-)
+const settings = useState<PayloadSiteSettings | null>('site-settings', () => null)
+
+if (import.meta.server) {
+  settings.value = await $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`)
+}
+
+onMounted(async () => {
+  settings.value = await $fetch<PayloadSiteSettings>(`${runtimeConfig.public.payloadUrl}/api/globals/site_settings`)
+})
 
 const homeAbout = computed(() => settings.value?.homeAbout)
 

@@ -17,10 +17,15 @@ const defaultLinks: SiteLink[] = [
   { label: 'About', linkType: 'internal', internalPath: '/about' },
 ]
 
-const { data: settings } = await useAsyncData<PayloadSiteSettings>(
-  'site-settings-nav',
-  () => $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`),
-)
+const settings = useState<PayloadSiteSettings | null>('site-settings', () => null)
+
+if (import.meta.server) {
+  settings.value = await $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`)
+}
+
+onMounted(async () => {
+  settings.value = await $fetch<PayloadSiteSettings>(`${config.public.payloadUrl}/api/globals/site_settings`)
+})
 
 const links = computed<SiteLink[]>(() => settings.value?.navLinks?.length
   ? settings.value.navLinks

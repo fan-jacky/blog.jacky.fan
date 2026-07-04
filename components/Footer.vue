@@ -4,10 +4,15 @@ import type { PayloadSiteSettings, SiteLink } from '~/types/payload'
 const config = useRuntimeConfig()
 const payloadUrl = config.payloadUrl || config.public.payloadUrl
 
-const { data: settings } = await useAsyncData<PayloadSiteSettings>(
-  'site-settings-footer',
-  () => $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`),
-)
+const settings = useState<PayloadSiteSettings | null>('site-settings', () => null)
+
+if (import.meta.server) {
+  settings.value = await $fetch<PayloadSiteSettings>(`${payloadUrl}/api/globals/site_settings`)
+}
+
+onMounted(async () => {
+  settings.value = await $fetch<PayloadSiteSettings>(`${config.public.payloadUrl}/api/globals/site_settings`)
+})
 
 const copyright = computed(() =>
   settings.value?.footerCopyright || '© 2023–2026 Jacky FAN — Hong Kong',
