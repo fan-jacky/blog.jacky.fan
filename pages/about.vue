@@ -13,7 +13,7 @@ useHead({
 
 const config = useRuntimeConfig()
 const { data: about } = await useAsyncData<PayloadAbout>('about-page', () =>
-  $fetch<PayloadAbout>(`${config.payloadUrl}/api/globals/about`)
+  $fetch<PayloadAbout>(`${config.public.payloadUrl}/api/globals/about`)
 )
 
 const bodyNodes = computed(() => about.value?.body ?? [])
