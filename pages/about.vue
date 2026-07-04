@@ -11,7 +11,8 @@ useHead({
   ],
 })
 
-const about = await $fetch<PayloadAbout>('/api/payload-about')
+const config = useRuntimeConfig()
+const about = await $fetch<PayloadAbout>(`${config.payloadUrl}/api/globals/about`)
 
 const bodyNodes = computed(() => about?.body ?? [])
 </script>
