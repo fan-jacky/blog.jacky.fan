@@ -12,18 +12,21 @@ useHead({
 })
 
 const config = useRuntimeConfig()
-const payloadUrl = config.payloadUrl || config.public.payloadUrl
 
-const { data: about, refresh } = await useAsyncData<PayloadAbout>(
-  'about-page',
-  () => $fetch<PayloadAbout>(`${payloadUrl}/api/globals/about`),
-  { server: true },
-)
+// useState handles SSR→client hydration. Start null, server sets it.
+const about = useState<PayloadAbout | null>('about-page', () => null)
 
-// Force refresh on every client-side mount
-if (import.meta.client) {
-  await refresh()
+if (import.meta.server) {
+  // SSR: fetch fresh, Nuxt serializes into payload automatically
+  about.value = await $fetch<PayloadAbout>(`${config.payloadUrl}/api/globals/about`)
 }
+
+// Client: always fetch fresh after mount (catches SPA navigations)
+// On hard-refresh hydration, this refetches the same data — no visible flash
+// because useState already has SSR data
+onMounted(async () => {
+  about.value = await $fetch<PayloadAbout>(`${config.public.payloadUrl}/api/globals/about`)
+})
 
 const bodyNodes = computed(() => about.value?.body ?? [])
 </script>
