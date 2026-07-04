@@ -11,21 +11,16 @@ useHead({
   ],
 })
 
-const config = useRuntimeConfig()
+const about = useState<PayloadAbout | null>('about-data', () => null)
 
-// useState handles SSR→client hydration. Start null, server sets it.
-const about = useState<PayloadAbout | null>('about-page-data', () => null)
-
+// SSR: fetch via server API route
 if (import.meta.server) {
-  // SSR: fetch fresh, Nuxt serializes into payload automatically
-  about.value = await $fetch<PayloadAbout>(`${config.payloadUrl}/api/globals/about`)
+  about.value = await $fetch<PayloadAbout>('/api/payload-about')
 }
 
-// Client: always fetch fresh after mount (catches SPA navigations)
-// On hard-refresh hydration, this refetches the same data — no visible flash
-// because useState already has SSR data
+// SPA navigation: refetch fresh
 onMounted(async () => {
-  about.value = await $fetch<PayloadAbout>(`${config.public.payloadUrl}/api/globals/about`)
+  about.value = await $fetch<PayloadAbout>('/api/payload-about')
 })
 
 const bodyNodes = computed(() => about.value?.body ?? [])
