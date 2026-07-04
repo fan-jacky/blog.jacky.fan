@@ -129,7 +129,7 @@
   &__select {
     width: 100%;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
     background: var(--bg-primary);
     color: var(--text-primary);
   }
@@ -168,7 +168,7 @@
     min-width: 170px;
     padding: 0.5rem 2.25rem 0.5rem 0.875rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
     background: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-sans);
@@ -328,7 +328,7 @@
   gap: 0.5rem;
   padding: 0.75rem 2rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 0.9375rem;
