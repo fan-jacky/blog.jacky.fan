@@ -55,7 +55,7 @@ services:
       PAYLOAD_URL: http://cms:4201
       NUXT_PUBLIC_PAYLOAD_URL: ${NUXT_PUBLIC_PAYLOAD_URL:-http://localhost:4201}
     ports:
-      - "4200:4200"
+      - "4200:4100"
     networks:
       - blog_network
 
