@@ -14,7 +14,7 @@ useHead({
 const config = useRuntimeConfig()
 
 // useState handles SSR→client hydration. Start null, server sets it.
-const about = useState<PayloadAbout | null>('about-page', () => null)
+const about = useState<PayloadAbout | null>('about-page-data', () => null)
 
 if (import.meta.server) {
   // SSR: fetch fresh, Nuxt serializes into payload automatically
