@@ -286,7 +286,7 @@ const RenderedSlate = defineComponent({
         <div
           ref="boxRef"
           class="content-modal__box"
-          @wheel.passive="onWheel"
+          @wheel="onWheel"
           @dblclick="onDoubleClick"
           @touchstart.passive="onTouchStart"
           @touchmove="onTouchMove"
