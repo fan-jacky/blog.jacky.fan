@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineComponent, h, onMounted, onUnmounted } from 'vue'
+import { defineComponent, h, onMounted, onUnmounted, watch } from 'vue'
 import type { VNodeChild } from 'vue'
 import ProseCode from '~/components/content/ProseCode.vue'
 import type { SlateLeaf, SlateNode } from '~/types/slate'
@@ -13,6 +13,15 @@ const config = useRuntimeConfig()
 const activeImage = ref<{ alt: string, src: string } | null>(null)
 const zoom = ref(1)
 const boxRef = ref<HTMLElement | null>(null)
+
+// Pan state
+const panX = ref(0)
+const panY = ref(0)
+const isDragging = ref(false)
+let dragStartX = 0
+let dragStartY = 0
+let dragStartPanX = 0
+let dragStartPanY = 0
 
 // Touch pinch state
 let initialPinchDistance = 0
@@ -107,12 +116,16 @@ function clampZoom(value: number): number {
 function openImageModal(image: { alt: string, src: string }): void {
   activeImage.value = image
   zoom.value = 1
+  panX.value = 0
+  panY.value = 0
   document.body.style.overflow = 'hidden'
 }
 
 function closeImageModal(): void {
   activeImage.value = null
   zoom.value = 1
+  panX.value = 0
+  panY.value = 0
   document.body.style.overflow = ''
 }
 
@@ -146,6 +159,28 @@ function getTouchDistance(touches: TouchList): number {
 
 function onDoubleClick(): void {
   zoom.value = zoom.value > 1 ? 1 : 2
+  panX.value = 0
+  panY.value = 0
+}
+
+function onMouseDown(event: MouseEvent): void {
+  if (zoom.value <= 1) return
+  isDragging.value = true
+  dragStartX = event.clientX
+  dragStartY = event.clientY
+  dragStartPanX = panX.value
+  dragStartPanY = panY.value
+  event.preventDefault()
+}
+
+function onMouseMove(event: MouseEvent): void {
+  if (!isDragging.value) return
+  panX.value = dragStartPanX + (event.clientX - dragStartX)
+  panY.value = dragStartPanY + (event.clientY - dragStartY)
+}
+
+function onMouseUp(): void {
+  isDragging.value = false
 }
 
 function onKeydown(event: KeyboardEvent): void {
@@ -158,9 +193,34 @@ onMounted(() => {
   window.addEventListener('keydown', onKeydown)
 })
 
+// Watch modal open/close to attach wheel/touch listeners directly to box element
+// with { passive: false } so preventDefault() actually works
+watch(boxRef, (el) => {
+  if (el) {
+    el.addEventListener('wheel', onWheel, { passive: false })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('mousedown', onMouseDown)
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }
+})
+
+watch(activeImage, (val) => {
+  if (!val && boxRef.value) {
+    // Clean up if needed (listeners stay on element until unmounted)
+  }
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
   document.body.style.overflow = ''
+  if (boxRef.value) {
+    boxRef.value.removeEventListener('wheel', onWheel)
+    boxRef.value.removeEventListener('touchmove', onTouchMove)
+    boxRef.value.removeEventListener('mousedown', onMouseDown)
+  }
+  document.removeEventListener('mousemove', onMouseMove)
+  document.removeEventListener('mouseup', onMouseUp)
 })
 
 function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
@@ -286,12 +346,13 @@ const RenderedSlate = defineComponent({
         <div
           ref="boxRef"
           class="content-modal__box"
-          @wheel="onWheel"
           @dblclick="onDoubleClick"
           @touchstart.passive="onTouchStart"
-          @touchmove="onTouchMove"
         >
-          <div class="content-modal__image-wrap">
+          <div
+            class="content-modal__image-wrap"
+            :style="{ transform: `translate(${panX}px, ${panY}px)` }"
+          >
             <img
               :src="activeImage.src"
               :alt="activeImage.alt"
