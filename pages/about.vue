@@ -13,7 +13,13 @@ useHead({
 
 const config = useRuntimeConfig()
 const payloadUrl = config.payloadUrl || config.public.payloadUrl
-const { data: about } = await useFetch<PayloadAbout>(`${payloadUrl}/api/globals/about`)
+
+// Clear any stale cached data before fetching
+clearNuxtData('about-page')
+
+const { data: about } = await useAsyncData<PayloadAbout>('about-page', () =>
+  $fetch<PayloadAbout>(`${payloadUrl}/api/globals/about`),
+)
 
 const bodyNodes = computed(() => about.value?.body ?? [])
 </script>
