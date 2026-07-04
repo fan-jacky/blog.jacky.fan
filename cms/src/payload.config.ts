@@ -7,6 +7,7 @@ import { slateEditor } from '@payloadcms/richtext-slate'
 import Posts from './collections/Posts'
 import Media from './collections/Media'
 import Users from './collections/Users'
+import About from './globals/About'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -62,6 +63,7 @@ export default buildConfig({
     },
   }),
   collections: [Posts, Media, Users],
+  globals: [About],
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || 'mongodb://localhost:27017/blog-cms',
   }),

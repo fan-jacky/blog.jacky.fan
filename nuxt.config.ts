@@ -23,11 +23,11 @@ export default defineNuxtConfig({
                 lang: "en",
             },
             meta: [
-                { property: 'og:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og-v3.png' },
+                { property: 'og:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og-v4.png' },
                 { property: 'og:image:width', content: '1200' },
                 { property: 'og:image:height', content: '630' },
                 { name: 'twitter:card', content: 'summary_large_image' },
-                { name: 'twitter:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og-v3.png' },
+                { name: 'twitter:image', content: 'http://rpi5-1:4201/api/media/file/blogjackyfan-og-v4.png' },
             ],
         },
     },

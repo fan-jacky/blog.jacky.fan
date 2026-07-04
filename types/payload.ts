@@ -56,6 +56,10 @@ export interface PayloadTocLink {
   depth: number
 }
 
+export interface PayloadAbout {
+  body?: SlateNode[]
+}
+
 export interface PayloadCollectionResponse<T> {
   docs: T[]
 }
