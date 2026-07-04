@@ -17,7 +17,7 @@ withDefaults(
   <div class="site-wrapper">
     <NavBar />
     <main id="main-content" class="site-main">
-      <section class="site-section" style="text-align:center">
+      <section class="site-section" style="text-align:center;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 64px);padding-top:0;padding-bottom:0">
         <div class="geo-circle geo-circle--lg" style="top:-80px;right:-80px;" />
         <div class="geo-circle geo-circle--sm" style="bottom:10%;left:8%;" />
         <div class="container">
