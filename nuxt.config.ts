@@ -42,7 +42,9 @@ export default defineNuxtConfig({
         "@nuxtjs/google-fonts",
     ],
     content: {
-        documentDriven: true,
+        // document-driven disabled — articles are managed by Payload CMS, not Nuxt Content.
+        // Only using @nuxt/content for prose components (ProseCode, ProsePre) + highlighting.
+        documentDriven: false,
         highlight: {
             theme: "one-dark-pro",
         },
