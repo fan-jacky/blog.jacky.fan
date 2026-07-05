@@ -36,7 +36,7 @@ export function resolvePayloadMediaUrl(
   try {
     return new URL(image.url).toString()
   } catch {
-    const base = runtimeConfig.public.payloadUrl || runtimeConfig.payloadUrl
+    const base = runtimeConfig.public.payloadUrl || runtimeConfig.payloadUrl || ''
 
     if (!base) {
       return image.url

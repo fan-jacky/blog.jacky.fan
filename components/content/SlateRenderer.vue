@@ -70,12 +70,14 @@ function sanitizeURL(url: string | undefined): string {
 }
 
 function resolveMediaURL(url: string | undefined | null, mediaId?: string): string {
+  const base = config.public.payloadUrl || config.payloadUrl || ''
+
   if (!url) {
+    if (mediaId && base) {
+      return `${base}/api/media/file/${mediaId}`
+    }
     if (mediaId) {
-      const base = config.public.payloadUrl || config.payloadUrl
-      if (base) {
-        return `${base}/api/media/file/${mediaId}`
-      }
+      return `/api/media/file/${mediaId}`
     }
     return ''
   }

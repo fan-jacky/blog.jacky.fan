@@ -7,9 +7,13 @@ const internalPayloadUrl =
     process.env.PAYLOAD_URL ||
     'http://localhost:4101'
 
+// Use ?? for NUXT_PUBLIC_PAYLOAD_URL so empty string (proxy mode) is preserved.
+// In proxy mode, client-side CMS calls go to same-origin /api/* and the Nuxt
+// server proxies to the internal CMS (cms:4201).  When unset (dev), falls
+// through to the internal URL as before.
 const publicPayloadUrl =
-    process.env.NUXT_PUBLIC_PAYLOAD_URL ||
-    process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+    process.env.NUXT_PUBLIC_PAYLOAD_URL ??
+    process.env.PAYLOAD_PUBLIC_SERVER_URL ??
     internalPayloadUrl
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
