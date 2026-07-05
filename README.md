@@ -89,3 +89,21 @@ This project uses the following tech:
 - [Utterances](https://utteranc.es/)
 - [Google Analytics](https://analytics.google.com/analytics/web/)
 - [Cloudflare Pages](https://pages.cloudflare.com/)
+
+## Backup
+
+Automated daily backups run on `rpi5-1` at 3am HKT via cron, covering both MongoDB data and uploaded media for both jacky.fan and blog.jacky.fan.
+
+**What's backed up:**
+- MongoDB dump (all collections, gzipped archive)
+- CMS upload files
+
+**Where:**
+- NAS at `192.168.0.220:/srv/dev-disk-by-uuid-.../cloud-1/site-backup/blog.jacky.fan/`
+- Google Drive at `site-backups/blog.jacky.fan/`
+
+**Format:** `blog.jacky.fan-2026-07-05-Sun-220220.zip` — readable timestamp with day-of-week, containing `mongo/dump.archive` and `uploads/...`
+
+**Retention:** 7 daily + weekly (Sunday) + monthly (1st). Older non-Sunday/non-1st backups are pruned automatically.
+
+**Script:** `/home/redfrogss/backup-sites.sh` on rpi5-1. Run manually with `bash /home/redfrogss/backup-sites.sh`.

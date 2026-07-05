@@ -1,8 +1,11 @@
 import type { SlateNode } from '~/types/slate'
 
 export interface PayloadMedia {
+  id?: string | number | null
   url?: string | null
   alt?: string | null
+  filename?: string | null
+  mimeType?: string | null
 }
 
 export interface PayloadPost {
@@ -35,7 +38,14 @@ export interface PayloadCodeBlock extends PayloadContentBlockBase {
   showLineNumbers?: boolean | null
 }
 
-export type PayloadContentBlock = PayloadRichTextBlock | PayloadCodeBlock
+export interface PayloadTwoColumnImageBlock extends PayloadContentBlockBase {
+  blockType: 'twoColumnImage'
+  leftImage: PayloadMedia
+  rightImage?: PayloadMedia | null
+  caption?: string | null
+}
+
+export type PayloadContentBlock = PayloadRichTextBlock | PayloadCodeBlock | PayloadTwoColumnImageBlock
 
 export interface PayloadPostSummary {
   id: number | string

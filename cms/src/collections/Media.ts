@@ -10,7 +10,7 @@ const Media: CollectionConfig = {
   folders: true,
   upload: {
     staticDir: path.resolve(dirname, '../../uploads'),
-    mimeTypes: ['image/*'],
+    mimeTypes: ['image/*', 'video/webm'],
     imageSizes: [
       {
         name: 'thumbnail',

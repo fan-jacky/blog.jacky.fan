@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { CodeBlock } from '../blocks/CodeBlock'
 import { RichTextBlock } from '../blocks/RichTextBlock'
+import { TwoColumnImage } from '../blocks/TwoColumnImage'
 
 function isLegacySlateContent(value: unknown): value is Array<Record<string, unknown>> {
   return Array.isArray(value) && value.some((item) => {
@@ -143,7 +144,7 @@ const Posts: CollectionConfig = {
       type: 'blocks',
       label: 'Content',
       required: true,
-      blocks: [RichTextBlock, CodeBlock],
+      blocks: [RichTextBlock, CodeBlock, TwoColumnImage],
       hooks: {
         afterRead: [({ value }) => normalizeContentBlocks(value)],
         beforeValidate: [({ value }) => normalizeContentBlocks(value)],

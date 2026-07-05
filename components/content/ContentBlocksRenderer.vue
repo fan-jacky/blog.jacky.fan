@@ -19,6 +19,12 @@ defineProps<{
         :language="block.language"
         :show-line-numbers="block.showLineNumbers"
       />
+      <TwoColumnImage
+        v-else-if="block.blockType === 'twoColumnImage'"
+        :left-image="block.leftImage"
+        :right-image="block.rightImage"
+        :caption="block.caption"
+      />
     </template>
   </div>
 </template>
