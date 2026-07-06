@@ -49,11 +49,6 @@ export default defineNuxtConfig({
             theme: "one-dark-pro",
         },
     },
-    appConfig: {
-        public: {
-            NUXT_PUBLIC_GTAG_ID: process.env.NUXT_PUBLIC_GTAG_ID,
-        },
-    },
     runtimeConfig: {
         // Server-only secrets
         previewSecret: process.env.PREVIEW_SECRET || '',
@@ -61,6 +56,7 @@ export default defineNuxtConfig({
         payloadApiKey: process.env.PAYLOAD_API_KEY || '',
         public: {
             payloadUrl: publicPayloadUrl,
+            gtagId: process.env.NUXT_PUBLIC_GTAG_ID || '',
         },
     },
     googleFonts: {
