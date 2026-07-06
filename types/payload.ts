@@ -41,8 +41,9 @@ export interface PayloadCodeBlock extends PayloadContentBlockBase {
 export interface PayloadTwoColumnImageBlock extends PayloadContentBlockBase {
   blockType: 'twoColumnImage'
   leftImage: PayloadMedia
+  leftCaption?: string | null
   rightImage?: PayloadMedia | null
-  caption?: string | null
+  rightCaption?: string | null
 }
 
 export type PayloadContentBlock = PayloadRichTextBlock | PayloadCodeBlock | PayloadTwoColumnImageBlock

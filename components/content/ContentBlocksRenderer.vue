@@ -22,8 +22,9 @@ defineProps<{
       <TwoColumnImage
         v-else-if="block.blockType === 'twoColumnImage'"
         :left-image="block.leftImage"
+        :left-caption="block.leftCaption"
         :right-image="block.rightImage"
-        :caption="block.caption"
+        :right-caption="block.rightCaption"
       />
     </template>
   </div>

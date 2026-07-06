@@ -18,6 +18,14 @@ export const TwoColumnImage: Block = {
       },
     },
     {
+      name: 'leftCaption',
+      type: 'text',
+      label: 'Left Caption',
+      admin: {
+        description: 'Optional caption shown below the left image.',
+      },
+    },
+    {
       name: 'rightImage',
       type: 'upload',
       relationTo: 'media',
@@ -28,11 +36,11 @@ export const TwoColumnImage: Block = {
       },
     },
     {
-      name: 'caption',
+      name: 'rightCaption',
       type: 'text',
-      label: 'Caption',
+      label: 'Right Caption',
       admin: {
-        description: 'Optional caption shown below both images.',
+        description: 'Optional caption shown below the right image.',
       },
     },
   ],

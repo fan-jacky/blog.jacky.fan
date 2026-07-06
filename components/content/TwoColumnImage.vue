@@ -4,8 +4,9 @@ import { resolvePayloadMediaUrl, resolvePayloadMediaAlt } from '~/utils/payloadP
 
 const props = defineProps<{
   leftImage: PayloadMedia
+  leftCaption?: string | null
   rightImage?: PayloadMedia | null
-  caption?: string | null
+  rightCaption?: string | null
 }>()
 
 const runtimeConfig = useRuntimeConfig()
@@ -49,6 +50,9 @@ const isRightWebM = computed(() => props.rightImage?.mimeType === 'video/webm')
           loading="lazy"
           class="two-col-image__media"
         >
+        <figcaption v-if="leftCaption" class="two-col-image__caption">
+          {{ leftCaption }}
+        </figcaption>
       </div>
       <div v-if="rightUrl" class="two-col-image__item">
         <video
@@ -68,11 +72,11 @@ const isRightWebM = computed(() => props.rightImage?.mimeType === 'video/webm')
           loading="lazy"
           class="two-col-image__media"
         >
+        <figcaption v-if="rightCaption" class="two-col-image__caption">
+          {{ rightCaption }}
+        </figcaption>
       </div>
     </div>
-    <figcaption v-if="caption" class="two-col-image__caption">
-      {{ caption }}
-    </figcaption>
   </figure>
 </template>
 
