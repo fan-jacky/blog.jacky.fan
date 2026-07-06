@@ -32,46 +32,50 @@ const isRightWebM = computed(() => props.rightImage?.mimeType === 'video/webm')
     :class="{ 'two-col-image--single': !rightUrl }"
   >
     <div class="two-col-image__grid">
-      <div class="two-col-image__item">
-        <video
-          v-if="isLeftWebM"
-          :src="leftUrl"
-          autoplay
-          loop
-          muted
-          playsinline
-          :aria-label="leftAlt"
-          class="two-col-image__media"
-        />
-        <img
-          v-else
-          :src="leftUrl"
-          :alt="leftAlt"
-          loading="lazy"
-          class="two-col-image__media"
-        >
+      <div class="two-col-image__col">
+        <div class="two-col-image__item">
+          <video
+            v-if="isLeftWebM"
+            :src="leftUrl"
+            autoplay
+            loop
+            muted
+            playsinline
+            :aria-label="leftAlt"
+            class="two-col-image__media"
+          />
+          <img
+            v-else
+            :src="leftUrl"
+            :alt="leftAlt"
+            loading="lazy"
+            class="two-col-image__media"
+          >
+        </div>
         <figcaption v-if="leftCaption" class="two-col-image__caption">
           {{ leftCaption }}
         </figcaption>
       </div>
-      <div v-if="rightUrl" class="two-col-image__item">
-        <video
-          v-if="isRightWebM"
-          :src="rightUrl"
-          autoplay
-          loop
-          muted
-          playsinline
-          :aria-label="rightAlt"
-          class="two-col-image__media"
-        />
-        <img
-          v-else
-          :src="rightUrl"
-          :alt="rightAlt"
-          loading="lazy"
-          class="two-col-image__media"
-        >
+      <div v-if="rightUrl" class="two-col-image__col">
+        <div class="two-col-image__item">
+          <video
+            v-if="isRightWebM"
+            :src="rightUrl"
+            autoplay
+            loop
+            muted
+            playsinline
+            :aria-label="rightAlt"
+            class="two-col-image__media"
+          />
+          <img
+            v-else
+            :src="rightUrl"
+            :alt="rightAlt"
+            loading="lazy"
+            class="two-col-image__media"
+          >
+        </div>
         <figcaption v-if="rightCaption" class="two-col-image__caption">
           {{ rightCaption }}
         </figcaption>
@@ -111,6 +115,7 @@ const isRightWebM = computed(() => props.rightImage?.mimeType === 'video/webm')
 
 .two-col-image__caption {
   margin-top: 0.75rem;
+  padding-bottom: 0.5rem;
   color: var(--text-muted);
   font-size: 0.8125rem;
   line-height: 1.5;
