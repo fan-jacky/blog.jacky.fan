@@ -13,7 +13,7 @@
     "@types/node": "^18.15.12",
     "@vueuse/core": "^10.2.0",
     "@vueuse/nuxt": "^10.2.0",
-    "nuxt": "^3.21.7",
+    "nuxt": "^3.21.10",
     "rss": "^1.2.2",
     "sass-embedded": "^1.100.0",
     "sitemap": "^7.1.1",
