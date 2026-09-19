@@ -6,6 +6,12 @@ html[data-theme='dark'] .site-section--dark {
   .section-subtitle {
     color: rgba(31, 29, 26, 0.7);
   }
+
+  // .about-blurb sits on an inverted (cream) background in dark mode,
+  // so it needs the light-theme accent, not the dark-theme one.
+  .about-blurb__link {
+    color: #3b5cb8;
+  }
 }
 
 html[data-theme='dark'] .geo-circle--lg {
