@@ -40,15 +40,12 @@ const CKEditorEditor: React.FC<CKEditorEditorProps> = ({
   disabled = false,
 }) => {
   const editorInstanceRef = useRef<ClassicEditor | null>(null)
-  const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
 
+  // No manual change listener here: the <CKEditor onChange={...}> prop below
+  // already fires on every `change:data` event, so registering another one
+  // would run the change handler (and any state update) twice per keystroke.
   const handleReady = (editor: ClassicEditor) => {
     editorInstanceRef.current = editor
-
-    editor.model.document.on('change:data', () => {
-      onChangeRef.current?.(editor.getData())
-    })
   }
 
   useEffect(() => {
@@ -134,7 +131,7 @@ const CKEditorEditor: React.FC<CKEditorEditorProps> = ({
         }}
         onReady={handleReady}
         onChange={(_event, editor) => {
-          onChangeRef.current?.(editor.getData())
+          onChange?.(editor.getData())
         }}
       />
     </div>

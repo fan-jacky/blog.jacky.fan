@@ -29,6 +29,7 @@
     "brace-expansion": "^5.0.12",
     "daisyui": "^3.1.1",
     "highlight.js": "^11.11.1",
+    "isomorphic-dompurify": "^4.4.0",
     "locomotive-scroll": "^5.0.1"
   }
 }

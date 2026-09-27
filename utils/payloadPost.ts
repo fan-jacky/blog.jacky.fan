@@ -17,17 +17,24 @@ function isCKRichTextBlock(block: PayloadContentBlock): block is Extract<Payload
   return block.blockType === 'ckRichText'
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+  nbsp: ' ',
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  '#39': "'",
+}
+
 function stripHtmlTags(html: string) {
   return html
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, '\'')
+    // Strip whole <script>/<style> elements first; tolerate whitespace inside the
+    // end tag (e.g. "</script >"), which a plain "</script>" match would miss.
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    // Decode entities in a single pass — sequential string replaces would
+    // double-unescape sequences like "&amp;lt;" into a raw "<".
+    .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (_, entity: string) => HTML_ENTITIES[entity])
 }
 
 export function normalizePayloadSlug(slug: string | string[] | undefined) {
