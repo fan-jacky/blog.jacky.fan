@@ -3,6 +3,7 @@
   "scripts": {
     "build": "node ./scripts/run-nuxt.mjs build",
     "dev": "node ./scripts/run-nuxt.mjs dev -p 4100",
+    "dev:full": "bash ./scripts/dev.sh",
     "generate": "node ./scripts/run-nuxt.mjs generate",
     "preview": "node ./scripts/run-nuxt.mjs preview -p 4100"
   },
