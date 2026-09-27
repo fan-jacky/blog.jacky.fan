@@ -13,6 +13,23 @@ function isCodeBlock(block: PayloadContentBlock): block is Extract<PayloadConten
   return block.blockType === 'codeBlock'
 }
 
+function isCKRichTextBlock(block: PayloadContentBlock): block is Extract<PayloadContentBlock, { blockType: 'ckRichText' }> {
+  return block.blockType === 'ckRichText'
+}
+
+function stripHtmlTags(html: string) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+}
+
 export function normalizePayloadSlug(slug: string | string[] | undefined) {
   if (Array.isArray(slug)) {
     return slug.join('/').trim()
@@ -100,6 +117,10 @@ export function extractTextFromContentBlocks(blocks: PayloadContentBlock[] = [])
     .map((block) => {
       if (isRichTextBlock(block)) {
         return extractTextFromSlate(block.body ?? [])
+      }
+
+      if (isCKRichTextBlock(block)) {
+        return stripHtmlTags(block.body ?? '')
       }
 
       if (isCodeBlock(block)) {

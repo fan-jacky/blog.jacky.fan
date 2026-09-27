@@ -13,6 +13,11 @@ defineProps<{
         v-if="block.blockType === 'richText'"
         :nodes="block.body ?? []"
       />
+      <div
+        v-else-if="block.blockType === 'ckRichText'"
+        class="ck-rich-text"
+        v-html="block.body ?? ''"
+      />
       <PayloadCodeBlock
         v-else-if="block.blockType === 'codeBlock'"
         :code="block.code"

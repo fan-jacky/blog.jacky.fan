@@ -46,7 +46,12 @@ export interface PayloadTwoColumnImageBlock extends PayloadContentBlockBase {
   rightCaption?: string | null
 }
 
-export type PayloadContentBlock = PayloadRichTextBlock | PayloadCodeBlock | PayloadTwoColumnImageBlock
+export interface PayloadCKRichTextBlock extends PayloadContentBlockBase {
+  blockType: 'ckRichText'
+  body?: string | null
+}
+
+export type PayloadContentBlock = PayloadRichTextBlock | PayloadCKRichTextBlock | PayloadCodeBlock | PayloadTwoColumnImageBlock
 
 export interface PayloadPostSummary {
   id: number | string

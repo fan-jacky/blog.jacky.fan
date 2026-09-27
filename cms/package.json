@@ -15,10 +15,13 @@
     "generate:graphql": "payload generate:graphql"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.2.0",
     "@payloadcms/db-mongodb": "^3.89.0",
     "@payloadcms/graphql": "3.90.0",
     "@payloadcms/next": "^3.89.0",
     "@payloadcms/richtext-slate": "^3.89.0",
+    "@payloadcms/ui": "3.90.0",
+    "ckeditor5": "^48.5.2",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",
