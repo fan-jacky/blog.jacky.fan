@@ -37,7 +37,7 @@ defineProps<{
       />
       <div
         v-else-if="block.blockType === 'ckRichText'"
-        class="ck-rich-text"
+        class="article-prose ck-rich-text"
         v-html="sanitizedCkHtml(block.body ?? '')"
       />
       <PayloadCodeBlock
