@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { CKRichTextBlock } from '../blocks/CKRichTextBlock'
 import { CodeBlock } from '../blocks/CodeBlock'
 import { RichTextBlock } from '../blocks/RichTextBlock'
 import { TwoColumnImage } from '../blocks/TwoColumnImage'
@@ -144,7 +145,7 @@ const Posts: CollectionConfig = {
       type: 'blocks',
       label: 'Content',
       required: true,
-      blocks: [RichTextBlock, CodeBlock, TwoColumnImage],
+      blocks: [RichTextBlock, CKRichTextBlock, CodeBlock, TwoColumnImage],
       hooks: {
         afterRead: [({ value }) => normalizeContentBlocks(value)],
         beforeValidate: [({ value }) => normalizeContentBlocks(value)],

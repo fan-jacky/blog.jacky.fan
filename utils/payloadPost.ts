@@ -13,6 +13,30 @@ function isCodeBlock(block: PayloadContentBlock): block is Extract<PayloadConten
   return block.blockType === 'codeBlock'
 }
 
+function isCKRichTextBlock(block: PayloadContentBlock): block is Extract<PayloadContentBlock, { blockType: 'ckRichText' }> {
+  return block.blockType === 'ckRichText'
+}
+
+const HTML_ENTITIES: Record<string, string> = {
+  nbsp: ' ',
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  '#39': "'",
+}
+
+function stripHtmlTags(html: string) {
+  return html
+    // Strip whole <script>/<style> elements first; tolerate whitespace inside the
+    // end tag (e.g. "</script >"), which a plain "</script>" match would miss.
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    // Decode entities in a single pass — sequential string replaces would
+    // double-unescape sequences like "&amp;lt;" into a raw "<".
+    .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (_, entity: string) => HTML_ENTITIES[entity])
+}
+
 export function normalizePayloadSlug(slug: string | string[] | undefined) {
   if (Array.isArray(slug)) {
     return slug.join('/').trim()
@@ -100,6 +124,10 @@ export function extractTextFromContentBlocks(blocks: PayloadContentBlock[] = [])
     .map((block) => {
       if (isRichTextBlock(block)) {
         return extractTextFromSlate(block.body ?? [])
+      }
+
+      if (isCKRichTextBlock(block)) {
+        return stripHtmlTags(block.body ?? '')
       }
 
       if (isCodeBlock(block)) {
