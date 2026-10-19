@@ -31,7 +31,9 @@ ok()   { printf '%s[dev OK]%s %s\n' "$C_GREEN" "$C_RESET" "$1"; }
 fail() { printf '%s[dev FAIL]%s %s\n' "$C_RED" "$C_RESET" "$1" >&2; exit 1; }
 
 port_pid() {
-  lsof -ti ":$1" 2>/dev/null || true
+  # Only match listeners: client sockets (e.g. VS Code's stale connections to
+  # a dev port) would otherwise make an idle port look "in use".
+  lsof -ti ":$1" -sTCP:LISTEN 2>/dev/null || true
 }
 
 # Wait until a TCP port accepts connections (timeout in seconds)
@@ -111,7 +113,19 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 if [ -n "$(port_pid "$CMS_PORT")" ]; then
-  log "Port $CMS_PORT already in use - assuming CMS is already running, skipping CMS startup."
+  # A listener on the port is NOT proof of a working CMS - a stale/hung
+  # next-server can accept connections but never respond (observed: every
+  # request to :4101 hung forever). Health-check it; restart if dead.
+  if curl -sf -m 5 -o /dev/null "http://127.0.0.1:$CMS_PORT/"; then
+    log "Port $CMS_PORT already in use and responding - assuming CMS is already running, skipping CMS startup."
+  else
+    log "Port $CMS_PORT is held by an unresponsive process (pid $(port_pid "$CMS_PORT")) - killing stale CMS..."
+    kill_tree "$(port_pid "$CMS_PORT")"
+    sleep 2
+    log "Starting Payload CMS dev server on port $CMS_PORT..."
+    (cd "$CMS_DIR" && NODE_OPTIONS='--no-deprecation' npx next dev --webpack -p "$CMS_PORT") &
+    CMS_PID=$!
+  fi
 else
   log "Starting Payload CMS dev server on port $CMS_PORT..."
   (cd "$CMS_DIR" && NODE_OPTIONS='--no-deprecation' npx next dev --webpack -p "$CMS_PORT") &
@@ -125,7 +139,7 @@ ok "CMS ready -> http://localhost:$CMS_PORT/admin"
 # -- 3. Nuxt blog (foreground) -------------------------------------------------
 
 if [ -n "$(port_pid "$NUXT_PORT")" ]; then
-  fail "Port $NUXT_PORT is already in use - stop the existing Nuxt process first (kill \$(lsof -ti :$NUXT_PORT))."
+  fail "Port $NUXT_PORT is already in use - stop the existing Nuxt process first (kill \$(lsof -ti :$NUXT_PORT -sTCP:LISTEN))."
 fi
 
 log "Starting Nuxt dev server on port $NUXT_PORT..."
