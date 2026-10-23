@@ -7,7 +7,7 @@ WORKDIR /app
 ARG PAYLOAD_SECRET
 ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
 
-RUN npm install -g pnpm@11
+RUN npm install -g pnpm@12
 
 # Install dependencies (including devDependencies needed for the build)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json next.config.ts next-env.d.ts ./
@@ -30,7 +30,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3001
 
-RUN npm install -g pnpm@11
+RUN npm install -g pnpm@12
 
 # Copy only what is needed to run the app
 COPY --from=builder /app/.next ./.next

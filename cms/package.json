@@ -4,6 +4,7 @@
   "description": "Payload CMS for blog.jacky.fan",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@12.15.0",
   "scripts": {
     "postinstall": "npm rebuild sharp && cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack -p 4101",
@@ -15,43 +16,32 @@
     "generate:graphql": "payload generate:graphql"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-react": "^11.2.0",
-    "@payloadcms/db-mongodb": "^3.89.0",
-    "@payloadcms/graphql": "3.90.0",
-    "@payloadcms/next": "^3.89.0",
-    "@payloadcms/richtext-slate": "^3.89.0",
-    "@payloadcms/ui": "3.90.0",
-    "ckeditor5": "^48.5.2",
+    "@ckeditor/ckeditor5-react": "^12.0.0",
+    "@payloadcms/db-mongodb": "^3.91.0",
+    "@payloadcms/graphql": "3.91.0",
+    "@payloadcms/next": "^3.91.0",
+    "@payloadcms/richtext-slate": "^3.91.0",
+    "@payloadcms/ui": "3.91.0",
+    "ckeditor5": "^49.0.0",
     "cross-env": "^10.1.0",
-    "dotenv": "^17.4.2",
-    "express": "^4.21.2",
-    "graphql": "^16.12.0",
-    "next": "^16.3.3",
-    "payload": "^3.89.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "sharp": "^0.35.4"
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "graphql": "^17.0.2",
+    "next": "^16.4.2",
+    "payload": "^3.91.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^25.9.1",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "sass": "^1.100.0",
-    "typescript": "^6.0.3"
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "sass": "^1.106.1",
+    "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=18.0.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "postcss": "^8.5.23"
-    },
-    "onlyBuiltDependencies": [
-      "@swc/core",
-      "esbuild",
-      "sharp",
-      "unrs-resolver"
-    ]
+    "node": ">=22.0.0"
   }
 }
