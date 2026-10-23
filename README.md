@@ -31,16 +31,16 @@ NUXT_PUBLIC_GTAG_ID=G-XXXXXXXXXX
 # Recommended Node.js version: >=22.0.0
 
 # Make sure to install the dependencies:
-yarn install
+pnpm install
 
 # Start the development server on http://localhost:3000
-yarn dev
+pnpm dev
 
 # Build the application for production:
-yarn build
+pnpm build
 
 # Locally preview production build:
-yarn preview
+pnpm preview
 
 ```
 
