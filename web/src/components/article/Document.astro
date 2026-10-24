@@ -1,0 +1,151 @@
+---
+// Port of components/article/Document.vue (build-time static rendering).
+// Media URLs are resolved with the same semantics as the Vue version; the
+// base mirrors `runtimeConfig.public.payloadUrl || runtimeConfig.payloadUrl`.
+import type { PayloadPost, PayloadPostSummary } from '@/types/payload'
+import {
+    buildArticlePath,
+    estimateContentBlocksReadTime,
+    formatPayloadDate,
+    getPrimaryPayloadTag,
+    resolvePayloadMediaAlt,
+} from '@/lib/payloadPost'
+import ContentBlocksRenderer from '@/components/content/ContentBlocksRenderer.astro'
+
+interface Props {
+    post: PayloadPost
+    relatedPosts?: PayloadPostSummary[]
+}
+
+const props = Astro.props
+
+const MEDIA_BASE = import.meta.env.PUBLIC_PAYLOAD_URL || import.meta.env.PAYLOAD_URL || ''
+
+function resolveMediaUrl(image: PayloadPost['featuredImage']): string {
+    if (!image || typeof image !== 'object' || !image.url) {
+        return ''
+    }
+
+    try {
+        return new URL(image.url).toString()
+    } catch {
+        if (!MEDIA_BASE) {
+            return image.url
+        }
+
+        try {
+            return new URL(image.url, MEDIA_BASE).toString()
+        } catch {
+            return image.url
+        }
+    }
+}
+
+const formattedDate = formatPayloadDate(props.post.publishedDate)
+const contentBlocks = props.post.content ?? []
+const readTime = estimateContentBlocksReadTime(contentBlocks)
+const hasContent = contentBlocks.length > 0
+const primaryTag = getPrimaryPayloadTag(props.post.tags)
+const heroImageUrl = resolveMediaUrl(props.post.featuredImage)
+const heroImageAlt = resolvePayloadMediaAlt(props.post.title, props.post.featuredImage)
+const relatedPosts = props.relatedPosts ?? []
+---
+
+<article>
+    <div class="article-page__hero reveal">
+        {
+            heroImageUrl ? (
+                <div class="article-page__hero-image">
+                    <img src={heroImageUrl} alt={heroImageAlt} />
+                </div>
+            ) : (
+                <div class="article-page__hero-image article-page__hero-placeholder" />
+            )
+        }
+    </div>
+
+    <header class="article-page__header reveal">
+        {primaryTag ? <span class="section-label">{primaryTag}</span> : null}
+        {props.post.status === 'draft' ? <div class="tag-pill">Draft</div> : null}
+        <h1 class="article-page__title">{props.post.title}</h1>
+        {props.post.description ? <p class="article-page__excerpt">{props.post.description}</p> : null}
+        <div class="article-page__meta">
+            {formattedDate ? <span>{formattedDate}</span> : null}
+            {formattedDate && props.post.author ? <span>·</span> : null}
+            {props.post.author ? <span>{props.post.author}</span> : null}
+            {formattedDate || props.post.author ? <span>·</span> : null}
+            <span>{readTime} min read</span>
+        </div>
+    </header>
+
+    <div class="article-page__body reveal">
+        {
+            hasContent ? (
+                <ContentBlocksRenderer blocks={contentBlocks} />
+            ) : (
+                <p class="article-page__empty">No content yet.</p>
+            )
+        }
+
+        <section class="article-author">
+            <div class="article-author__label">Written by</div>
+            <div class="article-author__card">
+                <div class="article-author__avatar">JF</div>
+                <div>
+                    <h2 class="article-author__name">{props.post.author || 'Jacky FAN'}</h2>
+                    <p class="article-author__bio">Frontend developer based in Hong Kong. Writing about web development, dev tooling, self-hosting, and the occasional hardware experiment.</p>
+                </div>
+                <div class="article-author__links">
+                    <a href="https://jacky.fan" target="_blank" rel="noopener" class="article-author__link" aria-label="Portfolio">
+                        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" /><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2" /></svg>
+                    </a>
+                    <a href="https://github.com/redfrogsss" target="_blank" rel="noopener" class="article-author__link" aria-label="GitHub">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="M8 1C4.13 1 1 4.13 1 8c0 3.1 2 5.72 4.78 6.65.35.06.48-.15.48-.33v-1.17c-1.94.42-2.35-.94-2.35-.94-.32-.81-.78-1.03-.78-1.03-.63-.43.05-.42.05-.42.7.05 1.07.72 1.07.72.62 1.07 1.64.76 2.04.58.06-.45.24-.76.44-.94-1.56-.18-3.2-.78-3.2-3.47 0-.77.27-1.4.72-1.89-.07-.17-.31-.88.07-1.83 0 0 .58-.19 1.9.71a6.6 6.6 0 013.48 0c1.32-.9 1.9-.71 1.9-.71.38.95.14 1.66.07 1.83.45.49.72 1.12.72 1.89 0 2.7-1.64 3.29-3.21 3.46.25.22.48.65.48 1.3v1.93c0 .18.12.4.48.33A7 7 0 0015 8c0-3.87-3.13-7-7-7z" fill="currentColor" /></svg>
+                    </a>
+                    <a href="/rss.xml" class="article-author__link" aria-label="RSS feed">
+                        <svg viewBox="0 0 16 16" fill="none"><circle cx="3" cy="13" r="1.5" fill="currentColor" /><path d="M1 6a9 9 0 019 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /><path d="M1 2a13 13 0 0113 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        {
+            relatedPosts.length > 0 && (
+                <section class="article-related">
+                    <div class="article-related__header">
+                        <span class="article-related__title">Continue Reading</span>
+                        <a href="/articles" class="article-related__view-all">View all articles →</a>
+                    </div>
+                    <div class="article-related__grid">
+                        {relatedPosts.map((relatedPost) => (
+                            <a href={buildArticlePath(relatedPost.slug)} class="article-card">
+                                <div class="article-card__image">
+                                    {resolveMediaUrl(relatedPost.featuredImage) ? (
+                                        <img
+                                            src={resolveMediaUrl(relatedPost.featuredImage)}
+                                            alt={resolvePayloadMediaAlt(relatedPost.title, relatedPost.featuredImage)}
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div class="article-card__placeholder" />
+                                    )}
+                                </div>
+                                <div class="article-card__body">
+                                    <div class="article-card__meta">
+                                        {getPrimaryPayloadTag(relatedPost.tags) ? (
+                                            <span class="tag-pill">{getPrimaryPayloadTag(relatedPost.tags)}</span>
+                                        ) : null}
+                                        {relatedPost.publishedDate ? (
+                                            <span>{formatPayloadDate(relatedPost.publishedDate)}</span>
+                                        ) : null}
+                                    </div>
+                                    <h3 class="article-card__title">{relatedPost.title}</h3>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </section>
+            )
+        }
+    </div>
+</article>

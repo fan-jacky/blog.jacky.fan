@@ -1,0 +1,407 @@
+---
+// Port of components/content/SlateRenderer.vue (378 lines) to build-time
+// static rendering.
+//
+// Recursion strategy: renderNode/renderChildren are plain frontmatter
+// functions returning HTML strings (leaf text and attributes are escaped the
+// way Vue's text interpolation would be), and the finished document is emitted
+// with a single set:html. The headingIds dedupe Map is threaded through the
+// recursion exactly like the Vue version.
+//
+// The Vue image lightbox (Teleport + reactive state) is ported to a hidden,
+// statically rendered .content-modal plus one small delegated client script
+// that reuses the existing .lightbox-* transition classes.
+import type { SlateLeaf, SlateNode } from '@/types/slate'
+import { createHeadingId, extractTextFromSlate } from '@/lib/payloadPost'
+
+interface Props {
+    nodes: SlateNode[]
+}
+
+const props = Astro.props
+
+// Mirrors the Vue version's `config.public.payloadUrl || config.payloadUrl`.
+const MEDIA_BASE = import.meta.env.PUBLIC_PAYLOAD_URL || import.meta.env.PAYLOAD_URL || ''
+
+interface UploadMediaValue {
+    id?: unknown
+    alt?: string | null
+    url?: string | null
+    filename?: string | null
+}
+
+// Inline copy of the ProseCode.vue copy icon (class="p-1").
+const PROSE_CODE_ICON =
+    '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="p-1"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>'
+
+function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+}
+
+function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
+    return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
+}
+
+function renderLeaf(leaf: SlateLeaf): string {
+    let content = escapeHtml(leaf.text)
+
+    // Wrap order matches the Vue version: strong > em > u > s > code.
+    if (leaf.bold) content = `<strong>${content}</strong>`
+    if (leaf.italic) content = `<em>${content}</em>`
+    if (leaf.underline) content = `<u>${content}</u>`
+    if (leaf.strikethrough) content = `<s>${content}</s>`
+    if (leaf.code) content = `<code>${content}</code>`
+
+    return content
+}
+
+function renderChildren(children: Array<SlateNode | SlateLeaf> = [], headingIds: Map<string, number>): string {
+    return children
+        .map((child) => {
+            if (isLeaf(child)) {
+                return renderLeaf(child)
+            }
+
+            return renderNode(child, headingIds)
+        })
+        .join('')
+}
+
+function sanitizeURL(url: string | undefined): string {
+    if (!url) return '#'
+    try {
+        const parsed = new URL(url)
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return url
+        }
+    } catch {
+        if (/^\//.test(url)) return url
+    }
+    return '#'
+}
+
+function resolveMediaURL(url: string | undefined | null, mediaId?: string): string {
+    if (!url) {
+        if (mediaId && MEDIA_BASE) {
+            return `${MEDIA_BASE}/api/media/file/${mediaId}`
+        }
+        if (mediaId) {
+            return `/api/media/file/${mediaId}`
+        }
+        return ''
+    }
+
+    try {
+        return new URL(url).toString()
+    } catch {
+        if (!MEDIA_BASE) {
+            return url
+        }
+
+        try {
+            return new URL(url, MEDIA_BASE).toString()
+        } catch {
+            return url
+        }
+    }
+}
+
+function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
+    return children
+        .map((child) => {
+            if (isLeaf(child)) {
+                return child.text
+            }
+
+            return extractCodeText(child.children ?? [])
+        })
+        .join('')
+}
+
+function renderProseCodeBlock(code: string): string {
+    // Byte-identical to what ProseCode.astro renders (slot = <pre><code>).
+    // The copy button carries no data-code, so the ProseCode copy handler
+    // picks the code up from the <pre><code> text content.
+    return `<div class="payload-code-block"><pre><code>${escapeHtml(code)}</code></pre><button aria-label="Copy Code" class="payload-code-block__copy">${PROSE_CODE_ICON}</button></div>`
+}
+
+function renderUpload(node: SlateNode): string {
+    const media =
+        typeof node.value === 'object' && node.value !== null ? (node.value as UploadMediaValue) : null
+    const mediaId = media?.id == null ? undefined : String(media.id)
+    const src = resolveMediaURL(media?.url ?? undefined, mediaId)
+
+    if (!src) {
+        return ''
+    }
+
+    const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
+    const caption = media?.alt?.trim()
+
+    return `<figure><button class="article-prose__image-trigger" type="button" aria-label="${escapeHtml(`Open full size image: ${alt}`)}" data-image-src="${escapeHtml(src)}" data-image-alt="${escapeHtml(alt)}" data-modal-id="${modalId}"><img alt="${escapeHtml(alt)}" loading="lazy" src="${escapeHtml(src)}"></button>${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ''}</figure>`
+}
+
+function renderNode(node: SlateNode, headingIds: Map<string, number>): string {
+    const children = renderChildren(node.children ?? [], headingIds)
+
+    switch (node.type) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'h4':
+        case 'h5':
+        case 'h6': {
+            const headingText = extractTextFromSlate(node.children ?? [])
+            const headingId = createHeadingId(headingText, headingIds)
+            const tag = node.type
+            return `<${tag} id="${escapeHtml(headingId)}">${children}</${tag}>`
+        }
+        case 'ul':
+            return `<ul>${children}</ul>`
+        case 'ol':
+            return `<ol>${children}</ol>`
+        case 'li':
+            return `<li>${children}</li>`
+        case 'blockquote':
+            return `<blockquote>${children}</blockquote>`
+        case 'code':
+            return renderProseCodeBlock(extractCodeText(node.children ?? []))
+        case 'link': {
+            const href = sanitizeURL(node.url)
+            const newTabAttrs = node.newTab ? ' rel="noopener noreferrer" target="_blank"' : ''
+            return `<a href="${escapeHtml(href)}"${newTabAttrs}>${children}</a>`
+        }
+        case 'upload':
+            return renderUpload(node)
+        default: {
+            // Vue checked the rendered children array length, which equals the
+            // input children count (nulls kept their slot).
+            const hasChildren = (node.children ?? []).length > 0
+            return hasChildren ? `<p>${children}</p>` : ''
+        }
+    }
+}
+
+// Unique per-instance id so each image trigger can find its own lightbox.
+const modalId = `content-modal-${Math.random().toString(36).slice(2, 10)}`
+
+const headingIds = new Map<string, number>()
+const renderedHtml = (props.nodes ?? [])
+    .map((node) => renderNode(node, headingIds))
+    .filter(Boolean)
+    .join('')
+---
+
+<div class="article-prose" set:html={renderedHtml} />
+
+<div class="content-modal" id={modalId} role="dialog" aria-modal="true" style="display: none;" data-content-modal>
+    <button type="button" class="content-modal__close" aria-label="Close image preview">
+        ✕
+    </button>
+    <div class="content-modal__box" data-content-modal-box>
+        <div class="content-modal__image-wrap" data-content-modal-wrap style="transform: translate(0px, 0px);">
+            <img class="content-modal__image" draggable="false" alt="" style="transform: scale(1);" data-content-modal-image />
+        </div>
+    </div>
+    <button type="button" class="content-modal__backdrop" aria-label="Close image preview"></button>
+</div>
+
+<script>
+    declare global {
+        interface Window {
+            __proseCodeCopyBound?: boolean
+        }
+    }
+
+    // -- Image lightbox (port of the Vue modal state machine) ----------------
+    function bindContentModals(): void {
+        const clampZoom = (value: number): number => Math.max(0.5, Math.min(5, value))
+
+        const getTouchDistance = (touches: TouchList): number => {
+            const first = touches[0]
+            const second = touches[1]
+            if (!first || !second) return 0
+            const dx = first.clientX - second.clientX
+            const dy = first.clientY - second.clientY
+            return Math.sqrt(dx * dx + dy * dy)
+        }
+
+        document.querySelectorAll<HTMLElement>('[data-content-modal]').forEach((modal) => {
+            const box = modal.querySelector<HTMLElement>('[data-content-modal-box]')
+            const wrap = modal.querySelector<HTMLElement>('[data-content-modal-wrap]')
+            const image = modal.querySelector<HTMLImageElement>('[data-content-modal-image]')
+            if (!box || !wrap || !image) return
+
+            let zoom = 1
+            let panX = 0
+            let panY = 0
+            let isDragging = false
+            let dragStartX = 0
+            let dragStartY = 0
+            let dragStartPanX = 0
+            let dragStartPanY = 0
+            let initialPinchDistance = 0
+            let initialPinchZoom = 1
+            let isOpen = false
+
+            const applyTransforms = (): void => {
+                image.style.transform = `scale(${zoom})`
+                image.style.userSelect = zoom > 1 ? 'none' : ''
+                wrap.style.transform = `translate(${panX}px, ${panY}px)`
+            }
+
+            const closeModal = (): void => {
+                if (!isOpen) return
+                isOpen = false
+                modal.classList.add('lightbox-leave-active', 'lightbox-leave-to')
+                window.setTimeout(() => {
+                    modal.classList.remove('lightbox-leave-active', 'lightbox-leave-to')
+                    modal.style.display = 'none'
+                    document.body.style.overflow = ''
+                    zoom = 1
+                    panX = 0
+                    panY = 0
+                    applyTransforms()
+                    image.removeAttribute('src')
+                    modal.removeAttribute('aria-label')
+                }, 200)
+            }
+
+            const openModal = (trigger: Element): void => {
+                const src = trigger.getAttribute('data-image-src') ?? ''
+                const alt = trigger.getAttribute('data-image-alt') ?? ''
+
+                image.setAttribute('src', src)
+                image.setAttribute('alt', alt)
+                modal.setAttribute('aria-label', alt)
+                zoom = 1
+                panX = 0
+                panY = 0
+                applyTransforms()
+                document.body.style.overflow = 'hidden'
+                modal.style.display = ''
+                modal.classList.add('lightbox-enter-active', 'lightbox-enter-from')
+                void modal.offsetHeight
+                modal.classList.remove('lightbox-enter-from')
+                window.setTimeout(() => {
+                    modal.classList.remove('lightbox-enter-active')
+                }, 300)
+                isOpen = true
+            }
+
+            modal.querySelector('.content-modal__close')?.addEventListener('click', closeModal)
+            modal.querySelector('.content-modal__backdrop')?.addEventListener('click', closeModal)
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) closeModal()
+            })
+
+            const modalId = modal.id
+            if (modalId) {
+                document
+                    .querySelectorAll<HTMLElement>(`.article-prose__image-trigger[data-modal-id="${modalId}"]`)
+                    .forEach((trigger) => {
+                        trigger.addEventListener('click', () => openModal(trigger))
+                    })
+            }
+
+            box.addEventListener('dblclick', () => {
+                zoom = zoom > 1 ? 1 : 2
+                panX = 0
+                panY = 0
+                applyTransforms()
+            })
+
+            box.addEventListener(
+                'touchstart',
+                (event) => {
+                    if (event.touches.length === 2) {
+                        initialPinchDistance = getTouchDistance(event.touches)
+                        initialPinchZoom = zoom
+                    }
+                },
+                { passive: true },
+            )
+
+            box.addEventListener('mousedown', (event) => {
+                if (zoom <= 1) return
+                isDragging = true
+                dragStartX = event.clientX
+                dragStartY = event.clientY
+                dragStartPanX = panX
+                dragStartPanY = panY
+                event.preventDefault()
+            })
+
+            document.addEventListener('mousemove', (event) => {
+                if (!isDragging) return
+                panX = dragStartPanX + (event.clientX - dragStartX)
+                panY = dragStartPanY + (event.clientY - dragStartY)
+                applyTransforms()
+            })
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false
+            })
+
+            // Window-level capture listeners — beats Locomotive Scroll.
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeModal()
+            })
+
+            window.addEventListener(
+                'wheel',
+                (event) => {
+                    if (!isOpen) return
+                    event.preventDefault()
+                    event.stopPropagation()
+                    const delta = event.deltaY > 0 ? -0.1 : 0.1
+                    zoom = clampZoom(zoom + delta)
+                    applyTransforms()
+                },
+                { capture: true, passive: false },
+            )
+
+            window.addEventListener(
+                'touchmove',
+                (event) => {
+                    if (!isOpen) return
+                    if (event.touches.length === 2) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        const currentDistance = getTouchDistance(event.touches)
+                        zoom = clampZoom(initialPinchZoom * (currentDistance / initialPinchDistance))
+                        applyTransforms()
+                    }
+                },
+                { capture: true, passive: false },
+            )
+        })
+    }
+
+    bindContentModals()
+
+    // -- ProseCode copy buttons (identical binding to ProseCode.astro) -------
+    function bindProseCodeCopy(): void {
+        if (window.__proseCodeCopyBound) return
+        window.__proseCodeCopyBound = true
+
+        document.addEventListener('click', (event) => {
+            const target = event.target instanceof Element ? event.target : null
+            const button = target?.closest('.payload-code-block__copy')
+
+            // Buttons carrying data-code belong to PayloadCodeBlock (toast flow,
+            // handled by its own script); skip them here.
+            if (!button || button.hasAttribute('data-code')) return
+
+            const code = button.closest('.payload-code-block')?.querySelector('pre code')?.textContent ?? ''
+            void navigator.clipboard.writeText(code)
+        })
+    }
+
+    bindProseCodeCopy()
+</script>

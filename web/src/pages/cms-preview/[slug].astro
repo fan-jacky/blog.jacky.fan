@@ -1,0 +1,45 @@
+---
+import Base from '@/layouts/Base.astro'
+import AppNotFound from '@/components/shared/AppNotFound.astro'
+import PreviewIsland from '@/islands/preview/PreviewIsland.vue'
+import type { PayloadPost } from '@/types/payload'
+import { fetchPayloadPostBySlug, isPayloadPreviewRequest } from '@/lib/payload'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const isPreviewRequest = isPayloadPreviewRequest(Astro.request)
+
+let post: PayloadPost | null = null
+
+if (slug) {
+  try {
+    // Draft content is only served when the preview flag cookie is present,
+    // mirroring /api/payload-post/[slug] (the secret handshake happens in
+    // /api/preview; the cookie itself is a non-sensitive flag).
+    post = await fetchPayloadPostBySlug(slug, { draft: isPreviewRequest })
+  } catch (error: unknown) {
+    console.error('[cms-preview] Failed to fetch post from CMS:', error)
+    post = null
+  }
+}
+
+if (!post) {
+  Astro.response.status = 404
+}
+
+const publicPayloadUrl = import.meta.env.PUBLIC_PAYLOAD_URL ?? ''
+---
+
+{post ? (
+  <Base title={post.title ?? 'Preview'} description={post.description ?? undefined}>
+    <Fragment slot="head">
+      <meta name="robots" content="noindex,nofollow" />
+    </Fragment>
+    <PreviewIsland client:only="vue" post={post} publicPayloadUrl={publicPayloadUrl} />
+  </Base>
+) : (
+  <Base title="404 - Page not found">
+    <AppNotFound />
+  </Base>
+)}

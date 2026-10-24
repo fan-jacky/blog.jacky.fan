@@ -1,9 +1,7 @@
 node_modules
 *.log*
-.nuxt
 .nitro
 .cache
-.output
 .env
 dist
 
@@ -14,6 +12,11 @@ cms/build/
 cms/node_modules/
 cms/src/payload-types.ts
 cms/src/generated-schema.graphql
+
+# Astro
+web/.astro/
+web/dist/
+web/node_modules/
 
 .github/copilot-instructions.md
 cms/src/secret.ts

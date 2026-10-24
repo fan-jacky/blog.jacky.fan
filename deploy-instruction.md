@@ -10,7 +10,7 @@ This document describes how to deploy the blog and Payload CMS using Docker Comp
 |------------|----------------------------------------------|--------------|
 | `mongodb`  | MongoDB 7 database used by Payload CMS       | (internal)   |
 | `cms`      | Payload CMS admin panel and REST API         | `3001`       |
-| `web`      | Nuxt 3 blog                                  | `3000`       |
+| `web`      | Astro blog (static HTML + preview endpoints) | `3000`       |
 
 ---
 
@@ -45,9 +45,9 @@ Edit `.env` and fill in:
 |-------------------|-----------------------------------------------------------------------------|
 | `PREVIEW_SECRET`  | A random string shared with the CMS to authenticate preview requests        |
 | `PAYLOAD_URL`     | Internal Docker network URL for the CMS (leave as `http://cms:3001`)        |
-| `NUXT_PUBLIC_PAYLOAD_URL` | Public URL where the CMS is reachable from the browser. This must exactly match the CMS origin, including `https://` when applicable. |
+| `PUBLIC_PAYLOAD_URL` | Public URL where the CMS is reachable from the browser. This must exactly match the CMS origin, including `https://` when applicable. Leave empty for proxy mode (browser calls go through the web server's `/api/*` proxy). |
 | `PAYLOAD_API_KEY` | API key generated from a CMS user (see step 4)                              |
-| `NUXT_PUBLIC_GTAG_ID` | (Optional) Google Analytics measurement ID                             |
+| `PUBLIC_GTAG_ID`  | (Optional) Google Analytics measurement ID                                  |
 
 ### CMS (`cms` service)
 
@@ -153,6 +153,22 @@ docker compose up -d --build
 ```
 
 Only changed services are rebuilt. MongoDB data is persisted in the `mongodb_data` volume.
+
+### Rebuilding after publishing content
+
+The Astro frontend prerenders all public pages to **static HTML at image build
+time**. After publishing or editing a post in the CMS, rebuild the `web` service
+to bake the new content into the static pages:
+
+```bash
+docker compose build web && docker compose up -d web
+```
+
+Automate this with a webhook or a cron job on the server. Note: on the **first**
+deploy the `web` image builds before the CMS container exists, so pages are
+prerendered empty — run the rebuild above once after the first boot. The live
+preview page and the `/api/*` endpoints are always served fresh and are not
+affected by build staleness.
 
 ---
 

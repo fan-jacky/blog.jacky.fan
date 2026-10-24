@@ -1,0 +1,147 @@
+---
+// Port of components/content/TwoColumnImage.vue (build-time static rendering).
+// The scoped styles from the Vue SFC are carried here (styles/ has no
+// two-col-image partial).
+import type { PayloadMedia } from '@/types/payload'
+
+interface Props {
+    leftImage: PayloadMedia
+    leftCaption?: string | null
+    rightImage?: PayloadMedia | null
+    rightCaption?: string | null
+}
+
+const props = Astro.props
+const { leftCaption = null, rightCaption = null } = props
+
+// Mirrors the Vue version's `runtimeConfig.public.payloadUrl || runtimeConfig.payloadUrl`.
+const MEDIA_BASE = import.meta.env.PUBLIC_PAYLOAD_URL || import.meta.env.PAYLOAD_URL || ''
+
+function resolveMediaUrl(image: PayloadMedia | number | string | null | undefined): string {
+    if (!image || typeof image !== 'object' || !image.url) {
+        return ''
+    }
+
+    try {
+        return new URL(image.url).toString()
+    } catch {
+        if (!MEDIA_BASE) {
+            return image.url
+        }
+
+        try {
+            return new URL(image.url, MEDIA_BASE).toString()
+        } catch {
+            return image.url
+        }
+    }
+}
+
+function resolveMediaAlt(fallbackTitle: string, image: PayloadMedia | number | string | null | undefined): string {
+    if (image && typeof image === 'object' && image.alt?.trim()) {
+        return image.alt
+    }
+
+    return `${fallbackTitle} featured image`
+}
+
+const leftUrl = resolveMediaUrl(props.leftImage)
+const leftAlt = resolveMediaAlt('Left image', props.leftImage)
+const isLeftWebM = props.leftImage?.mimeType === 'video/webm'
+
+const rightUrl = props.rightImage ? resolveMediaUrl(props.rightImage) : null
+const rightAlt = props.rightImage ? resolveMediaAlt('Right image', props.rightImage) : ''
+const isRightWebM = props.rightImage?.mimeType === 'video/webm'
+---
+
+<figure class:list={['two-col-image', { 'two-col-image--single': !rightUrl }]}>
+    <div class="two-col-image__grid">
+        <div class="two-col-image__col">
+            <div class="two-col-image__item">
+                {
+                    isLeftWebM ? (
+                        <video
+                            src={leftUrl}
+                            autoplay
+                            loop
+                            muted
+                            playsinline
+                            aria-label={leftAlt}
+                            class="two-col-image__media"
+                        ></video>
+                    ) : (
+                        <img src={leftUrl} alt={leftAlt} loading="lazy" class="two-col-image__media" />
+                    )
+                }
+            </div>
+            {leftCaption ? <figcaption class="two-col-image__caption">{leftCaption}</figcaption> : null}
+        </div>
+        {
+            rightUrl ? (
+                <div class="two-col-image__col">
+                    <div class="two-col-image__item">
+                        {isRightWebM ? (
+                            <video
+                                src={rightUrl}
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                aria-label={rightAlt}
+                                class="two-col-image__media"
+                            ></video>
+                        ) : (
+                            <img src={rightUrl} alt={rightAlt} loading="lazy" class="two-col-image__media" />
+                        )}
+                    </div>
+                    {rightCaption ? <figcaption class="two-col-image__caption">{rightCaption}</figcaption> : null}
+                </div>
+            ) : null
+        }
+    </div>
+</figure>
+
+<style>
+    .two-col-image {
+        margin: 2rem 0;
+    }
+
+    .two-col-image__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .two-col-image--single .two-col-image__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .two-col-image__item {
+        overflow: hidden;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+    }
+
+    .two-col-image__media {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    .two-col-image__caption {
+        margin-top: 0.75rem;
+        padding-bottom: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .two-col-image__grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

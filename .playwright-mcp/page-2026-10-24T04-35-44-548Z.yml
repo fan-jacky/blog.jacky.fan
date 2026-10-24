@@ -1,0 +1,231 @@
+- generic [active] [ref=f10e1]:
+  - generic [ref=f10e2]:
+    - link "Skip to content" [ref=f10e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=f10e5]:
+      - banner [ref=f10e6]:
+        - generic [ref=f10e7]:
+          - link "Jacky FAN home" [ref=f10e8] [cursor=pointer]:
+            - /url: /
+            - text: Jacky FAN's Blog
+          - navigation "Primary" [ref=f10e10]:
+            - generic [ref=f10e11]:
+              - link "Writing" [ref=f10e12] [cursor=pointer]:
+                - /url: /
+              - link "All Articles" [ref=f10e13] [cursor=pointer]:
+                - /url: /articles
+              - link "About" [ref=f10e14] [cursor=pointer]:
+                - /url: /about
+            - button "Toggle dark mode" [ref=f10e15] [cursor=pointer]
+      - main [ref=f10e19]:
+        - generic [ref=f10e21]:
+          - link "All articles" [ref=f10e22] [cursor=pointer]:
+            - /url: /articles
+          - article [ref=f10e23]:
+            - generic [ref=f10e26]:
+              - heading "Quote Style" [level=1] [ref=f10e27]
+              - generic [ref=f10e28]: 5 min read
+            - generic [ref=f10e30]:
+              - generic [ref=f10e31]:
+                - generic [ref=f10e32]:
+                  - blockquote [ref=f10e33]: This is a Quote
+                  - paragraph [ref=f10e34]: This is a paragraph
+                - generic [ref=f10e35]:
+                  - heading "VRC Volleyball Serve Analysis with Jev" [level=1] [ref=f10e36]
+                  - paragraph [ref=f10e37]
+                  - paragraph [ref=f10e38]
+                  - paragraph [ref=f10e39]:
+                    - link [ref=f10e40] [cursor=pointer]:
+                      - /url: https://www.google.com/
+                      - text: This is so good
+                      - strong [ref=f10e41]: haha
+                  - paragraph [ref=f10e42]: asd as
+                  - paragraph [ref=f10e43]:
+                    - strong [ref=f10e44]: Idea / Plan — not yet implemented.
+                    - text: Analyze a top-down recording of two players practicing serves in VRC Volleyball (5:42, 1080p 30fps,
+                    - code [ref=f10e45]: ~/2026-09-21_20-56-43.mp4
+                    - text: ) using the
+                    - strong [ref=f10e46]: Jev
+                    - text: model via OpenRouter (
+                    - code [ref=f10e47]: ~typesafe/jev-latest
+                    - text: "— workspace-scoped alias that always routes to the latest Jev model; very cheap: ~$0.042/M input tokens)."
+                  - paragraph [ref=f10e48]
+                  - heading "Goal" [level=2] [ref=f10e49]
+                  - paragraph [ref=f10e50]: "Per-serve structured analytics: success/failure, start & landing position, ball speed, plus session-level aggregates (success rate, per-player splits, landing heatmap)."
+                  - heading "Key constraints discovered" [level=2] [ref=f10e51]
+                  - list [ref=f10e52]:
+                    - listitem [ref=f10e53]:
+                      - text: Jev's input modalities are
+                      - strong [ref=f10e54]: text + image
+                      - text: — it does not ingest raw video. The pipeline must extract frames and feed them as images.
+                    - listitem [ref=f10e55]:
+                      - text: The recording is
+                      - strong [ref=f10e56]: top-down
+                      - text: ", so pixel coordinates map ~linearly to court coordinates. A one-time calibration (corner clicking or prompt-based corner detection) converts pixels → real court meters (standard court: 18 m × 9 m)."
+                    - listitem [ref=f10e57]: Two players + multiple stray balls on court; per-serve attribution needs the model to track the served ball, not just any ball.
+                  - heading "Pipeline (5 stages)" [level=2] [ref=f10e58]
+                  - heading "1. Frame extraction (ffmpeg)" [level=3] [ref=f10e59]
+                  - list [ref=f10e60]:
+                    - listitem [ref=f10e61]: "Extract frames at a chosen fps (start: 2 fps → ~685 frames; tune later)."
+                    - listitem [ref=f10e62]:
+                      - text: Persist frame index → timestamp map (
+                      - code [ref=f10e63]: frames.jsonl
+                      - text: ) so every event resolves back to video time.
+                    - listitem [ref=f10e64]: Optional scene-change pre-filter to cut duplicate frames.
+                  - heading "2. Serve event detection (Jev, pass A)" [level=3] [ref=f10e65]
+                  - list [ref=f10e66]:
+                    - listitem [ref=f10e67]:
+                      - text: Batch frames (e.g. groups of 6–10, chronological) to Jev with a strict JSON-schema prompt:"Does a serve occur in this sequence? Return
+                      - code [ref=f10e68]: "{serve_detected, start_frame, player_side, confidence}"
+                      - text: ."
+                    - listitem [ref=f10e69]: Chain consecutive batches with a 1-frame overlap to avoid missing serves at batch boundaries.
+                    - listitem [ref=f10e70]:
+                      - text: "Output: candidate serve windows"
+                      - code [ref=f10e71]: "[t_start, t_end]"
+                      - text: with player attribution (left/right side).
+                  - heading "3. Per-serve analysis (Jev, pass B — the core pass)" [level=3] [ref=f10e72]
+                  - paragraph [ref=f10e73]:
+                    - text: For each serve window, feed a denser frame sequence (e.g. 5–8 fps locally around the window) plus a one-time
+                    - strong [ref=f10e74]: court calibration image
+                    - text: "(full court frame with labeled corners A/B/C/D) in the same conversation, and ask for structured output:"
+                  - code [ref=f10e76]: "{ \"serve_id\": \"...\", \"player\": \"left | right\", \"outcome\": \"success | net | out | fault\", \"ball_start\": {\"x_m\": 0, \"y_m\": 0, \"frame\": 0, \"t_s\": 0}, \"ball_land\": {\"x_m\": 0, \"y_m\": 0, \"frame\": 0, \"t_s\": 0}, \"ball_path_px\": [{\"x\": 0, \"y\": 0, \"frame\": 0}], \"trajectory_shape\": \"straight | loopy | sidespin-drift\", \"confidence\": 0.0 }"
+                  - paragraph [ref=f10e77]: "Prompt engineering notes:"
+                  - list [ref=f10e78]:
+                    - listitem [ref=f10e79]:
+                      - text: Ask the model to reason about the ball's
+                      - strong [ref=f10e80]: motion trail
+                      - text: (visible in frames as a faint streak) for direction & speed.
+                    - listitem [ref=f10e81]: Request pixel coords first, convert to meters in code using the calibration — don't trust the model to do unit math.
+                    - listitem [ref=f10e82]:
+                      - text: Use OpenRouter
+                      - strong [ref=f10e83]: structured outputs
+                      - text: (
+                      - code [ref=f10e84]: response_format
+                      - text: ) if Jev supports it; otherwise parse + validate with Pydantic and re-ask on failure.
+                  - heading "4. Derived metrics (pure code, no model)" [level=3] [ref=f10e85]
+                  - list [ref=f10e86]:
+                    - listitem [ref=f10e87]:
+                      - strong [ref=f10e88]: Ball speed
+                      - text: ": track ball position across frames within a serve → px/frame → m/s via calibration & known fps. (Also sanity-check: serve distance ÷ flight time.)"
+                    - listitem [ref=f10e89]:
+                      - strong [ref=f10e90]: Success rate
+                      - text: ": per player, per session; breakdown by outcome class."
+                    - listitem [ref=f10e91]:
+                      - strong [ref=f10e92]: Landing distribution
+                      - text: ": scatter of landing points → simple ASCII/HTML heatmap; measure depth (distance from net) and lateral spread."
+                    - listitem [ref=f10e93]:
+                      - strong [ref=f10e94]: Consistency
+                      - text: ": std-dev of landing positions and speeds per player."
+                  - heading "5. Output" [level=3] [ref=f10e95]
+                  - list [ref=f10e96]:
+                    - listitem [ref=f10e97]:
+                      - code [ref=f10e98]: serves.json
+                      - text: — raw per-serve records.
+                    - listitem [ref=f10e99]:
+                      - code [ref=f10e100]: report.md
+                      - text: "— Obsidian-friendly summary: stats tables + embedded heatmap image + links back to video timestamps ("
+                      - code [ref=f10e101]: obsidian://
+                      - text: or plain
+                      - code [ref=f10e102]: mm:ss
+                      - text: ).
+                    - listitem [ref=f10e103]:
+                      - text: "Optional later: cut per-serve clips ("
+                      - code [ref=f10e104]: ffmpeg -ss … -t …
+                      - text: ) for review.
+                  - heading "Stage 2 — Real-time streaming variant (future)" [level=2] [ref=f10e105]
+                  - paragraph [ref=f10e106]:
+                    - text: The batch pipeline above is post-hoc; end-to-end "serve detected → analysis ready" latency would be
+                    - strong [ref=f10e107]: ~2–5 s behind live
+                    - text: (frame batching + pass B + upload). A streaming redesign targets
+                    - strong [ref=f10e108]: ~0.5–1 s delay
+                    - text: — not true real-time, but usable as a live HUD.
+                  - 'heading "Architecture: hybrid local-CV + Jev" [level=3] [ref=f10e109]'
+                  - paragraph [ref=f10e110]: "The insight: heavy multi-frame perception is what's slow and costly. Split the work:"
+                  - list [ref=f10e111]:
+                    - listitem [ref=f10e112]:
+                      - strong [ref=f10e113]: Local CV (OpenCV) at full 30 fps, in-process
+                      - text: — ball detection by color/shape (orange court + white ball with motion trail is very tractable). Tracks ball position continuously → speed, trajectory, and landing detection
+                      - strong [ref=f10e114]: instantly, with zero model latency
+                      - text: .
+                    - listitem [ref=f10e115]:
+                      - strong [ref=f10e116]: Jev for semantics only
+                      - text: — one call per event (small burst of frames around landing) to classify outcome (net / out / fault / in) and attribute the player. Runs once per serve, not per frame.
+                  - heading "Streaming pipeline" [level=3] [ref=f10e117]
+                  - list [ref=f10e118]:
+                    - listitem [ref=f10e119]:
+                      - strong [ref=f10e120]: Ingest
+                      - text: —
+                      - code [ref=f10e121]: ffmpeg
+                      - text: reads the source as a stream (RTMP, screen capture, or webcam) into a rolling segment buffer.
+                    - listitem [ref=f10e122]:
+                      - strong [ref=f10e123]: Sliding-window detection
+                      - text: — the local tracker watches continuously; when it sees a serve-shaped trajectory (ball launched from behind a player, crossing the net region, then landing), it triggers event handling.
+                    - listitem [ref=f10e124]:
+                      - strong [ref=f10e125]: Event analysis
+                      - text: — grab ~4–8 frames around the event from the buffer → single Jev call for outcome + player attribution → metrics appended live.
+                    - listitem [ref=f10e126]:
+                      - strong [ref=f10e127]: Live output
+                      - text: — running stats (success rate, recent serves) rendered as a simple HUD/web panel; per-serve records appended to
+                      - code [ref=f10e128]: serves.jsonl
+                      - text: as they happen.
+                  - paragraph [ref=f10e129]: Stages run in parallel, so analysis of serve n overlaps tracking of serve n+1.
+                  - heading "Trade-offs vs batch pipeline" [level=3] [ref=f10e130]
+                  - list [ref=f10e131]:
+                    - listitem [ref=f10e132]:
+                      - strong [ref=f10e133]: "Pro:"
+                      - text: near-live feedback, Jev calls drop to ~1 per serve (much cheaper per session), no 685-frame batch cost.
+                    - listitem [ref=f10e134]:
+                      - strong [ref=f10e135]: "Con:"
+                      - text: local tracker needs tuning (lighting/occlusion robustness); attribution and edge-case outcomes lean entirely on Jev's single-call judgment; streaming source adds infra complexity (buffer management, reconnects).
+                    - listitem [ref=f10e136]:
+                      - strong [ref=f10e137]: "Fallback:"
+                      - text: if the tracker loses the ball mid-flight, push the burst of recent frames to Jev as the detector of last resort.
+                  - heading "Validation" [level=2] [ref=f10e138]
+                  - list [ref=f10e139]:
+                    - listitem [ref=f10e140]:
+                      - text: Manually spot-check 2–3 serves against the video (timestamps from
+                      - code [ref=f10e141]: frames.jsonl
+                      - text: ).
+                    - listitem [ref=f10e142]: Cross-check model-reported landing positions against frame evidence.
+                    - listitem [ref=f10e143]: "Speed sanity range: volleyball serves typically 8–30 m/s; flag outliers."
+                  - heading "Cost estimate" [level=2] [ref=f10e144]
+                  - paragraph [ref=f10e145]: ~685 detection frames + ~150 analysis frames → roughly 80–100 image-bearing calls at Jev's price point → well under $1 for the full session.
+                  - heading "Open questions" [level=2] [ref=f10e146]
+                  - list [ref=f10e147]:
+                    - listitem [ref=f10e148]:
+                      - text: Exact Jev model id behind
+                      - code [ref=f10e149]: ~typesafe/jev-latest
+                      - text: alias, and whether it honors
+                      - code [ref=f10e150]: response_format
+                      - text: /structured outputs.
+                    - listitem [ref=f10e151]: Max images per request (batch sizing constraint).
+                    - listitem [ref=f10e152]: Whether one calibration frame in-context is enough, or corners should be measured once in code (click-based) and hardcoded.
+                    - listitem [ref=f10e153]: "Frame rate sweet spot: serves are fast (~0.5–1 s flight); 30 fps local extraction around detected windows may be needed for speed estimates."
+              - generic [ref=f10e154]:
+                - generic [ref=f10e155]: Written by
+                - generic [ref=f10e156]:
+                  - generic [ref=f10e157]: JF
+                  - generic [ref=f10e158]:
+                    - heading "Jacky FAN" [level=2] [ref=f10e159]
+                    - paragraph [ref=f10e160]: Frontend developer based in Hong Kong. Writing about web development, dev tooling, self-hosting, and the occasional hardware experiment.
+                  - generic [ref=f10e161]:
+                    - link "Portfolio" [ref=f10e162] [cursor=pointer]:
+                      - /url: https://jacky.fan
+                    - link "GitHub" [ref=f10e166] [cursor=pointer]:
+                      - /url: https://github.com/redfrogsss
+                    - link "RSS feed" [ref=f10e169] [cursor=pointer]:
+                      - /url: /rss.xml
+      - contentinfo [ref=f10e174]:
+        - generic [ref=f10e175]:
+          - generic [ref=f10e176]: © 2023–2026 Jacky FAN — Hong Kong
+          - generic [ref=f10e177]:
+            - link "GitHub" [ref=f10e178] [cursor=pointer]:
+              - /url: https://github.com/redfrogsss
+            - link "Blog" [ref=f10e179] [cursor=pointer]:
+              - /url: https://blog.jacky.fan
+            - link "Sitemap" [ref=f10e180] [cursor=pointer]:
+              - /url: /sitemap.xml
+  - generic [ref=f10e181]:
+    - generic [ref=f10e182]: Preview mode — this content may not be published yet.
+    - link "Exit Preview" [ref=f10e183] [cursor=pointer]:
+      - /url: /api/disable-preview

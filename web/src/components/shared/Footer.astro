@@ -1,0 +1,51 @@
+---
+// Ported from components/Footer.vue (Nuxt → Astro).
+// Site settings are fetched at build time; the client-side refetch from the
+// Vue version (onMounted) is intentionally not ported — pages are static.
+import type { PayloadSiteSettings, SiteLink } from '@/types/payload'
+import { fetchPayloadSiteSettings } from '@/lib/payload'
+
+let settings: PayloadSiteSettings | null = null
+
+try {
+  settings = await fetchPayloadSiteSettings()
+} catch {
+  settings = null
+}
+
+const copyright = settings?.footerCopyright || '© 2023–2026 Jacky FAN — Hong Kong'
+
+const footerLinks: SiteLink[] = settings?.footerLinks?.length
+  ? settings.footerLinks
+  : [
+      { label: 'GitHub', linkType: 'external', externalUrl: 'https://github.com/redfrogsss' },
+      { label: 'Blog', linkType: 'external', externalUrl: 'https://blog.jacky.fan' },
+      { label: 'Sitemap', linkType: 'internal', internalPath: '/sitemap.xml' },
+    ]
+
+function resolveHref(link: SiteLink): string {
+  return link.linkType === 'external' ? (link.externalUrl ?? '#') : (link.internalPath ?? '/')
+}
+---
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__info">{copyright}</span>
+    <div class="site-footer__links">
+      {footerLinks.map((link) => (
+        link.linkType === 'internal' ? (
+          <a href={resolveHref(link)}>
+            {link.label}
+          </a>
+        ) : (
+          <a
+            href={resolveHref(link)}
+            target="_blank"
+            rel="noopener"
+          >
+            {link.label}
+          </a>
+        )
+      ))}
+    </div>
+  </div>
+</footer>

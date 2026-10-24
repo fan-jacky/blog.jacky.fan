@@ -1,0 +1,50 @@
+---
+// Port of components/article/TableOfContent.vue (build-time static rendering).
+// The Vue version renders pure static links (no scroll-spy script), so there
+// is no client script here; links are computed server-side via
+// extractContentBlocksTableOfContents() in lib/payloadPost.ts.
+import type { PayloadTocLink } from '@/types/payload'
+
+interface Props {
+    links: PayloadTocLink[]
+}
+
+const { links } = Astro.props
+---
+
+<div class="bg-base-100 rounded-lg shadow-md my-4 px-8 py-12 hidden lg:block sticky top-4">
+    <div class="prose">
+        <h4 class="text-xl">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="inline h-[1.2em] mb-1 mr-1"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                ></path>
+            </svg>
+            Table of Content
+        </h4>
+        {
+            links.length ? (
+                <ul>
+                    {links.map((link) => (
+                        <li class:list={[link.depth > 2 ? 'pl-4' : null]}>
+                            <a href={`#${link.id}`} class="hover:text-blue-500 no-underline font-normal transition-all">
+                                {link.text}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p class="text-sm text-base-content/60">No headings in this post.</p>
+            )
+        }
+    </div>
+</div>

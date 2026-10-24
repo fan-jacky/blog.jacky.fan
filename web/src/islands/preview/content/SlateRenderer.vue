@@ -1,0 +1,380 @@
+<script setup lang="ts">
+import { computed, defineComponent, h, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { VNodeChild } from 'vue'
+import ProseCode from './ProseCode.vue'
+import type { SlateLeaf, SlateNode } from '@/types/slate'
+import { createHeadingId, extractTextFromSlate } from '../payloadPost'
+
+const props = defineProps<{
+  nodes: SlateNode[]
+}>()
+
+const payloadUrl = import.meta.env.PUBLIC_PAYLOAD_URL || ''
+const activeImage = ref<{ alt: string, src: string } | null>(null)
+const zoom = ref(1)
+const boxRef = ref<HTMLElement | null>(null)
+
+// Pan state
+const panX = ref(0)
+const panY = ref(0)
+const isDragging = ref(false)
+let dragStartX = 0
+let dragStartY = 0
+let dragStartPanX = 0
+let dragStartPanY = 0
+
+// Touch pinch state
+let initialPinchDistance = 0
+let initialPinchZoom = 1
+
+function isLeaf(node: SlateNode | SlateLeaf): node is SlateLeaf {
+  return typeof (node as SlateLeaf).text === 'string' && !(node as SlateNode).type
+}
+
+function renderLeaf(leaf: SlateLeaf): VNodeChild {
+  let content: VNodeChild = leaf.text
+
+  if (leaf.bold) content = h('strong', content)
+  if (leaf.italic) content = h('em', content)
+  if (leaf.underline) content = h('u', content)
+  if (leaf.strikethrough) content = h('s', content)
+  if (leaf.code) content = h('code', content)
+
+  return content
+}
+
+function renderChildren(
+  children: Array<SlateNode | SlateLeaf> = [],
+  headingIds: Map<string, number>,
+): VNodeChild[] {
+  return children.map((child, index) => {
+    if (isLeaf(child)) {
+      return renderLeaf(child)
+    }
+
+    return renderNode(child, headingIds, index)
+  })
+}
+
+function sanitizeURL(url: string | undefined): string {
+  if (!url) return '#'
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url
+    }
+  } catch {
+    if (/^\//.test(url)) return url
+  }
+  return '#'
+}
+
+function resolveMediaURL(url: string | undefined | null, mediaId?: string): string {
+  const base = payloadUrl
+
+  if (!url) {
+    if (mediaId && base) {
+      return `${base}/api/media/file/${mediaId}`
+    }
+    if (mediaId) {
+      return `/api/media/file/${mediaId}`
+    }
+    return ''
+  }
+
+  try {
+    return new URL(url).toString()
+  } catch {
+    const base = payloadUrl
+
+    if (!base) {
+      return url
+    }
+
+    try {
+      return new URL(url, base).toString()
+    } catch {
+      return url
+    }
+  }
+}
+
+function extractCodeText(children: Array<SlateNode | SlateLeaf> = []): string {
+  return children
+    .map((child) => {
+      if (isLeaf(child)) {
+        return child.text
+      }
+
+      return extractCodeText(child.children ?? [])
+    })
+    .join('')
+}
+
+function clampZoom(value: number): number {
+  return Math.max(0.5, Math.min(5, value))
+}
+
+function openImageModal(image: { alt: string, src: string }): void {
+  activeImage.value = image
+  zoom.value = 1
+  panX.value = 0
+  panY.value = 0
+  document.body.style.overflow = 'hidden'
+}
+
+function closeImageModal(): void {
+  activeImage.value = null
+  zoom.value = 1
+  panX.value = 0
+  panY.value = 0
+  document.body.style.overflow = ''
+}
+
+// Window-level wheel handler with capture phase — beats Locomotive Scroll
+function onWheelCapture(event: WheelEvent): void {
+  if (!activeImage.value) return
+  event.preventDefault()
+  event.stopPropagation()
+  const delta = event.deltaY > 0 ? -0.1 : 0.1
+  zoom.value = clampZoom(zoom.value + delta)
+}
+
+function onTouchStart(event: TouchEvent): void {
+  if (event.touches.length === 2) {
+    initialPinchDistance = getTouchDistance(event.touches)
+    initialPinchZoom = zoom.value
+  }
+}
+
+function onTouchMoveCapture(event: TouchEvent): void {
+  if (!activeImage.value) return
+  if (event.touches.length === 2) {
+    event.preventDefault()
+    event.stopPropagation()
+    const currentDistance = getTouchDistance(event.touches)
+    const scale = currentDistance / initialPinchDistance
+    zoom.value = clampZoom(initialPinchZoom * scale)
+  }
+}
+
+function getTouchDistance(touches: TouchList): number {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function onDoubleClick(): void {
+  zoom.value = zoom.value > 1 ? 1 : 2
+  panX.value = 0
+  panY.value = 0
+}
+
+function onMouseDown(event: MouseEvent): void {
+  if (zoom.value <= 1) return
+  isDragging.value = true
+  dragStartX = event.clientX
+  dragStartY = event.clientY
+  dragStartPanX = panX.value
+  dragStartPanY = panY.value
+  event.preventDefault()
+}
+
+function onMouseMove(event: MouseEvent): void {
+  if (!isDragging.value) return
+  panX.value = dragStartPanX + (event.clientX - dragStartX)
+  panY.value = dragStartPanY + (event.clientY - dragStartY)
+}
+
+function onMouseUp(): void {
+  isDragging.value = false
+}
+
+function onKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Escape') {
+    closeImageModal()
+  }
+}
+
+// Attach capture-phase listeners on window to beat Locomotive Scroll
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('wheel', onWheelCapture, { capture: true, passive: false })
+  window.addEventListener('touchmove', onTouchMoveCapture, { capture: true, passive: false })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('wheel', onWheelCapture, { capture: true })
+  window.removeEventListener('touchmove', onTouchMoveCapture, { capture: true })
+  document.body.style.overflow = ''
+  document.removeEventListener('mousemove', onMouseMove)
+  document.removeEventListener('mouseup', onMouseUp)
+})
+
+// Attach box-level listeners when box element is available
+watch(boxRef, (el, _, cleanup) => {
+  if (!el) return
+  el.addEventListener('mousedown', onMouseDown)
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
+
+  cleanup(() => {
+    el.removeEventListener('mousedown', onMouseDown)
+    document.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('mouseup', onMouseUp)
+  })
+})
+
+function renderUpload(node: SlateNode, key?: number | string): VNodeChild | null {
+  const media = typeof node.value === 'object' && node.value !== null ? node.value : null
+  // Payload upload nodes carry an `id` that is not part of the shared SlateNode
+  // type — read it through a structural cast (compile-only; runtime unchanged).
+  const mediaId = (media as { id?: string } | null)?.id
+  const src = resolveMediaURL(media?.url as string | undefined, mediaId)
+
+  if (!src) {
+    return null
+  }
+
+  const alt = media?.alt?.trim() || media?.filename?.trim() || 'Article image'
+  const caption = media?.alt?.trim()
+
+  return h('figure', [
+    h(
+      'button',
+      {
+        'aria-label': `Open full size image: ${alt}`,
+        class: 'article-prose__image-trigger',
+        key,
+        type: 'button',
+        onClick: () => openImageModal({ alt, src }),
+      },
+      [h('img', { alt, loading: 'lazy', src })],
+    ),
+    caption ? h('figcaption', caption) : null,
+  ])
+}
+
+function renderNode(
+  node: SlateNode,
+  headingIds: Map<string, number>,
+  key?: number | string,
+): VNodeChild | null {
+  const children = renderChildren(node.children ?? [], headingIds)
+
+  switch (node.type) {
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6': {
+      const headingText = extractTextFromSlate(node.children ?? [])
+      const headingId = createHeadingId(headingText, headingIds)
+      return h(node.type, { id: headingId, key }, children)
+    }
+    case 'ul':
+      return h('ul', { key }, children)
+    case 'ol':
+      return h('ol', { key }, children)
+    case 'li':
+      return h('li', { key }, children)
+    case 'blockquote':
+      return h('blockquote', { key }, children)
+    case 'code': {
+      const code = extractCodeText(node.children ?? [])
+
+      return h(
+        ProseCode,
+        { code, key },
+        {
+          default: () => [h('pre', [h('code', code)])],
+        },
+      )
+    }
+    case 'link': {
+      const href = sanitizeURL(node.url)
+      return h(
+        'a',
+        {
+          href,
+          key,
+          ...(node.newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}),
+        },
+        children,
+      )
+    }
+    case 'upload':
+      return renderUpload(node, key)
+    default:
+      return children.length > 0 ? h('p', { key }, children) : null
+  }
+}
+
+const renderedNodes = computed(() => {
+  const headingIds = new Map<string, number>()
+
+  return (props.nodes ?? []).map((node, index) => renderNode(node, headingIds, index)).filter(Boolean)
+})
+
+const RenderedSlate = defineComponent({
+  name: 'RenderedSlate',
+  setup() {
+    return () => renderedNodes.value
+  },
+})
+
+const imageStyle = computed(() => ({
+  transform: `scale(${zoom.value})`,
+  userSelect: zoom.value > 1 ? 'none' : undefined,
+} as Record<string, string | undefined>))
+</script>
+
+<template>
+  <div class="article-prose">
+    <RenderedSlate />
+  </div>
+  <Teleport to="body">
+    <Transition name="lightbox">
+      <div
+        v-if="activeImage"
+        class="content-modal"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="activeImage.alt"
+        @click.self="closeImageModal"
+      >
+        <button
+          type="button"
+          class="content-modal__close"
+          aria-label="Close image preview"
+          @click="closeImageModal"
+        >
+          ✕
+        </button>
+        <div
+          ref="boxRef"
+          class="content-modal__box"
+          @dblclick="onDoubleClick"
+          @touchstart.passive="onTouchStart"
+        >
+          <div
+            class="content-modal__image-wrap"
+            :style="{ transform: `translate(${panX}px, ${panY}px)` }"
+          >
+            <img
+              :src="activeImage.src"
+              :alt="activeImage.alt"
+              class="content-modal__image"
+              draggable="false"
+              @dragstart.prevent
+              :style="imageStyle"
+            >
+          </div>
+        </div>
+        <button type="button" class="content-modal__backdrop" aria-label="Close image preview" @click="closeImageModal" />
+      </div>
+    </Transition>
+  </Teleport>
+</template>

@@ -1,0 +1,134 @@
+---
+// Ported from app.vue + nuxt.config.ts app.head + plugins (Nuxt → Astro).
+// Document shell only: pages render their own NavBar / main / PreviewBar /
+// Footer inside the slot, matching the Nuxt page structure.
+import '@/styles/global.scss'
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const { title = undefined, description = undefined } = Astro.props
+
+const gtagId = import.meta.env.PUBLIC_GTAG_ID
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {title ? <title>{title}</title> : null}
+    {description ? <meta name="description" content={description} /> : null}
+    <slot name="head" />
+    <meta property="og:image" content="http://rpi5-1:4201/api/media/file/blogjackyfan-og-v4.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="http://rpi5-1:4201/api/media/file/blogjackyfan-og-v4.png" />
+    <script is:inline>
+      // Dark mode bootstrap (ported from NavBar.vue onMounted). Runs before
+      // first paint; same DOM contract: `data-theme` attribute on <html> and
+      // the `theme` key in localStorage, so daisyUI theming keeps working.
+      const storedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    </script>
+    {gtagId ? (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`}></script>
+        <script is:inline define:vars={{ gtagId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { window.dataLayer.push(arguments); }
+          gtag('js', new Date());
+          // @ts-ignore — gtagId is injected by define:vars at build time
+          gtag('config', gtagId);
+        </script>
+      </>
+    ) : null}
+  </head>
+  <body>
+    <div class="site-shell" data-scroll-container>
+      <a href="#main-content" class="skip-link">Skip to content</a>
+      <slot />
+    </div>
+
+    <script>
+      // Dark mode toggle (ported from NavBar.vue toggleTheme). Delegated from
+      // the document so it works for the .theme-toggle button rendered by
+      // NavBar.astro, plus the Ctrl+Shift+D shortcut from the Vue app.
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+
+        if (isDark) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      document.addEventListener('click', (event) => {
+        if (event.target instanceof Element && event.target.closest('.theme-toggle')) {
+          toggleTheme();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.ctrlKey && event.shiftKey && event.key === 'D') {
+          event.preventDefault();
+          toggleTheme();
+        }
+      });
+    </script>
+
+    <script>
+      // Smooth scrolling (ported from plugins/locomotive-scroll.client.ts).
+      // The locomotive-scroll CSS is already imported by global.scss.
+      // Note: locomotive-scroll v5 wraps Lenis — it takes no `el`/`smooth`
+      // top-level options (the Nuxt plugin's were silently ignored), so the
+      // intended lerp goes through lenisOptions. Lenis smooth-scrolls the
+      // document by default.
+      import LocomotiveScroll from 'locomotive-scroll';
+
+      new LocomotiveScroll({ lenisOptions: { lerp: 0.08 } });
+    </script>
+
+    <script>
+      // Reveal-on-scroll animations (ported from app.vue). Runs on every page
+      // load, which replaces the Vue route-change watcher in an MPA.
+      const targets = Array.from(document.querySelectorAll<HTMLElement>('.reveal, .reveal-stagger'));
+
+      if (targets.length) {
+        if (!('IntersectionObserver' in window)) {
+          for (const element of targets) {
+            element.classList.add('is-visible');
+          }
+        } else {
+          const revealObserver = new IntersectionObserver(
+            (entries, observer) => {
+              for (const entry of entries) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-visible');
+                  observer.unobserve(entry.target);
+                }
+              }
+            },
+            {
+              threshold: 0.15,
+              rootMargin: '0px 0px -40px 0px',
+            },
+          );
+
+          for (const element of targets) {
+            revealObserver.observe(element);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

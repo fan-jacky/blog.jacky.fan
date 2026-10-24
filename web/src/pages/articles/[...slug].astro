@@ -1,0 +1,79 @@
+---
+import Base from '@/layouts/Base.astro'
+import NavBar from '@/components/shared/NavBar.astro'
+import PreviewBar from '@/components/shared/PreviewBar.astro'
+import Footer from '@/components/shared/Footer.astro'
+import Document from '@/components/article/Document.astro'
+import Navigator from '@/components/article/Navigator.astro'
+import type { PayloadPost } from '@/types/payload'
+import { normalizePayloadSlug, parsePayloadTags } from '@/lib/payloadPost'
+import { fetchPayloadPostsForBuild, toPayloadPostSummary } from '@/lib/payload'
+
+interface Props {
+    post: PayloadPost
+    posts: PayloadPost[]
+}
+
+export async function getStaticPaths() {
+    // One fetch of all published posts (depth 1, published only, sorted
+    // -publishedDate) — mirrors /api/payload-posts plus /api/payload-post/[slug]
+    // for every article page.
+    const posts = await fetchPayloadPostsForBuild({ depth: 1 })
+
+    return posts
+        .map((post) => ({
+            params: { slug: normalizePayloadSlug(post.slug) },
+            props: { post, posts },
+        }))
+        .filter((entry) => entry.params.slug !== '')
+}
+
+const { post, posts } = Astro.props
+
+const postSummaries = posts.map(toPayloadPostSummary)
+
+const currentPostIndex = postSummaries.findIndex(({ slug: entrySlug }) => entrySlug === post.slug)
+
+const prevPost = currentPostIndex >= 0 && currentPostIndex + 1 < postSummaries.length
+    ? postSummaries[currentPostIndex + 1]
+    : null
+
+const nextPost = currentPostIndex > 0 ? postSummaries[currentPostIndex - 1] : null
+
+const relatedPosts = (() => {
+    const currentTags = new Set(parsePayloadTags(post.tags).map((tag) => tag.toLowerCase()))
+
+    return postSummaries
+        .filter(({ slug: entrySlug }) => entrySlug !== post.slug)
+        .map((entry) => {
+            const entryTags = parsePayloadTags(entry.tags).map((tag) => tag.toLowerCase())
+            const sharedScore = entryTags.filter((tag) => currentTags.has(tag)).length
+
+            return { entry, sharedScore }
+        })
+        .sort((left, right) => right.sharedScore - left.sharedScore)
+        .slice(0, 3)
+        .map(({ entry }) => entry)
+})()
+---
+
+<Base
+  title={post.title}
+  description={post.description ?? ''}
+>
+  <div class="site-wrapper">
+      <NavBar />
+      <main id="main-content" class="site-main">
+          <section class="site-section site-section--article">
+              <div class="geo-circle geo-circle--sm" style="top:8%;right:5%;"></div>
+              <div class="container">
+                  <a href="/articles" class="article-page__back-link reveal">← All articles</a>
+                  <Document post={post} relatedPosts={relatedPosts} />
+                  <Navigator prev={prevPost} next={nextPost} class="reveal" />
+              </div>
+          </section>
+      </main>
+      <PreviewBar />
+      <Footer />
+  </div>
+</Base>

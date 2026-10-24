@@ -1,0 +1,109 @@
+- generic [ref=f2e3]:
+  - link "Skip to content" [ref=f2e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f2e5]:
+    - banner [ref=f2e6]:
+      - generic [ref=f2e7]:
+        - link "Jacky FAN home" [ref=f2e8] [cursor=pointer]:
+          - /url: /
+          - text: Jacky FAN's Blog
+        - navigation "Primary" [ref=f2e10]:
+          - generic [ref=f2e11]:
+            - link "Writing" [ref=f2e12] [cursor=pointer]:
+              - /url: /
+            - link "All Articles" [ref=f2e13] [cursor=pointer]:
+              - /url: /articles
+            - link "About" [ref=f2e14] [cursor=pointer]:
+              - /url: /about
+          - button "Toggle dark mode" [ref=f2e15] [cursor=pointer]
+    - main [ref=f2e19]:
+      - generic [ref=f2e21]:
+        - heading "Jacky FAN's Blog" [level=1] [ref=f2e22]
+        - link "Latest Article I migrated my websites into Payload CMS A hands‑on walkthrough of migrating two personal sites to Payload CMS, highlighting code‑first development, live preview, and how GitHub Copilot streamlined the process. CMS June 15, 2026 · 5 min read I migrated my websites into Payload CMS featured image" [ref=f2e23] [cursor=pointer]:
+          - /url: /articles/i-migrated-my-websites-into-payload-cms
+          - generic [ref=f2e24]:
+            - generic [ref=f2e25]: Latest Article
+            - heading "I migrated my websites into Payload CMS" [level=2] [ref=f2e26]
+            - paragraph [ref=f2e27]: A hands‑on walkthrough of migrating two personal sites to Payload CMS, highlighting code‑first development, live preview, and how GitHub Copilot streamlined the process.
+            - generic [ref=f2e28]:
+              - generic [ref=f2e29]: CMS
+              - generic [ref=f2e30]: June 15, 2026
+              - generic [ref=f2e31]: ·
+              - generic [ref=f2e32]: 5 min read
+          - img "I migrated my websites into Payload CMS featured image" [ref=f2e34]
+      - generic [ref=f2e36]:
+        - generic [ref=f2e37]: Recent Articles
+        - heading "Latest Writing" [level=2] [ref=f2e38]
+        - paragraph [ref=f2e39]: Notes on programming, dev tooling, self-hosting, and more.
+        - generic [ref=f2e40]:
+          - link "I migrated my websites into Payload CMS featured image CMS June 15, 2026 I migrated my websites into Payload CMS A hands‑on walkthrough of migrating two personal sites to Payload CMS, highlighting code‑first development, live preview, and how GitHub Copilot streamlined the process." [ref=f2e41] [cursor=pointer]:
+            - /url: /articles/i-migrated-my-websites-into-payload-cms
+            - img "I migrated my websites into Payload CMS featured image" [ref=f2e43]
+            - generic [ref=f2e44]:
+              - generic [ref=f2e45]:
+                - generic [ref=f2e46]: CMS
+                - generic [ref=f2e47]: June 15, 2026
+              - heading "I migrated my websites into Payload CMS" [level=3] [ref=f2e48]
+              - paragraph [ref=f2e49]: A hands‑on walkthrough of migrating two personal sites to Payload CMS, highlighting code‑first development, live preview, and how GitHub Copilot streamlined the process.
+          - 'link "Force Use npm, yarn or pnpm featured image Dev Tooling April 30, 2024 Force Use npm, yarn or pnpm Nowadays, there are many package manager on the Internet, such as `npm`, `pnpm` and `yarn`. Most of the time, we do not want to accidentally run other package managers when the project is already setup using a package manager for avoiding potential issues in the future." [ref=f2e50] [cursor=pointer]':
+            - /url: /articles/force-use-npm-yarn-or-pnpm
+            - img "Force Use npm, yarn or pnpm featured image" [ref=f2e52]
+            - generic [ref=f2e53]:
+              - generic [ref=f2e54]:
+                - generic [ref=f2e55]: Dev Tooling
+                - generic [ref=f2e56]: April 30, 2024
+              - heading "Force Use npm, yarn or pnpm" [level=3] [ref=f2e57]
+              - paragraph [ref=f2e58]: "Nowadays, there are many package manager on the Internet, such as `npm`, `pnpm` and `yarn`. Most of the time, we do not want to accidentally run other package managers when the project is already setup using a package manager for avoiding potential issues in the future."
+          - link "Running Minecraft Server with Docker and docker-compose featured image DevOps February 2, 2024 Running Minecraft Server with Docker and docker-compose In this blog post, I am going to share how I run my minecraft server with docker and docker-compose." [ref=f2e59] [cursor=pointer]:
+            - /url: /articles/running-minecraft-server-with-docker-and-docker-container
+            - img "Running Minecraft Server with Docker and docker-compose featured image" [ref=f2e61]
+            - generic [ref=f2e62]:
+              - generic [ref=f2e63]:
+                - generic [ref=f2e64]: DevOps
+                - generic [ref=f2e65]: February 2, 2024
+              - heading "Running Minecraft Server with Docker and docker-compose" [level=3] [ref=f2e66]
+              - paragraph [ref=f2e67]: In this blog post, I am going to share how I run my minecraft server with docker and docker-compose.
+          - link "First Impression on Raspberry Pi 5 featured image Hardware January 29, 2024 First Impression on Raspberry Pi 5 Discover the capabilities of the Raspberry Pi 5, from its easy setup process to running Large Language Models (LLMs), and explore its potential for various projects in a cost-effective manner." [ref=f2e68] [cursor=pointer]:
+            - /url: /articles/first-impression-on-raspberry-pi-5
+            - img "First Impression on Raspberry Pi 5 featured image" [ref=f2e70]
+            - generic [ref=f2e71]:
+              - generic [ref=f2e72]:
+                - generic [ref=f2e73]: Hardware
+                - generic [ref=f2e74]: January 29, 2024
+              - heading "First Impression on Raspberry Pi 5" [level=3] [ref=f2e75]
+              - paragraph [ref=f2e76]: Discover the capabilities of the Raspberry Pi 5, from its easy setup process to running Large Language Models (LLMs), and explore its potential for various projects in a cost-effective manner.
+          - link "How to apply Google's font with NuxtJS and Tailwind featured image Frontend August 14, 2023 How to apply Google's font with NuxtJS and Tailwind Learn how to apply Google's modern-looking Roboto font to your NuxtJS website with the help of TailwindCSS. This blog post covers the steps to load the font using the Nuxt Google Fonts module and apply it to your website with TailwindCSS." [ref=f2e77] [cursor=pointer]:
+            - /url: /articles/how-to-apply-google-font-with-nuxtjs
+            - img "How to apply Google's font with NuxtJS and Tailwind featured image" [ref=f2e79]
+            - generic [ref=f2e80]:
+              - generic [ref=f2e81]:
+                - generic [ref=f2e82]: Frontend
+                - generic [ref=f2e83]: August 14, 2023
+              - heading "How to apply Google's font with NuxtJS and Tailwind" [level=3] [ref=f2e84]
+              - paragraph [ref=f2e85]: Learn how to apply Google's modern-looking Roboto font to your NuxtJS website with the help of TailwindCSS. This blog post covers the steps to load the font using the Nuxt Google Fonts module and apply it to your website with TailwindCSS.
+          - link "Running Meta's Llama 2 on LocalAI featured image AI July 24, 2023 Running Meta's Llama 2 on LocalAI This blog post provides a guide on how to run Meta's new language model, Llama 2, on LocalAI. It includes an overview of Llama 2 and LocalAI, as well as a step-by-step guide on how to set up and run the language model on your own computer. The author also shares their thoughts on Llama 2's performance in answering questions, generating programming code, and writing documents." [ref=f2e86] [cursor=pointer]:
+            - /url: /articles/running-meta-llama-2-on-localai
+            - img "Running Meta's Llama 2 on LocalAI featured image" [ref=f2e88]
+            - generic [ref=f2e89]:
+              - generic [ref=f2e90]:
+                - generic [ref=f2e91]: AI
+                - generic [ref=f2e92]: July 24, 2023
+              - heading "Running Meta's Llama 2 on LocalAI" [level=3] [ref=f2e93]
+              - paragraph [ref=f2e94]: This blog post provides a guide on how to run Meta's new language model, Llama 2, on LocalAI. It includes an overview of Llama 2 and LocalAI, as well as a step-by-step guide on how to set up and run the language model on your own computer. The author also shares their thoughts on Llama 2's performance in answering questions, generating programming code, and writing documents.
+        - link "View all articles →" [ref=f2e96] [cursor=pointer]:
+          - /url: /articles
+      - generic [ref=f2e99]:
+        - heading "Hi, I'm Jacky" [level=2] [ref=f2e100]
+        - paragraph [ref=f2e101]: A frontend developer based in Hong Kong. I write about web development, dev tooling, self-hosting, and the occasional hardware experiment.
+        - link "More about me →" [ref=f2e102] [cursor=pointer]:
+          - /url: /about
+    - contentinfo [ref=f2e103]:
+      - generic [ref=f2e104]:
+        - generic [ref=f2e105]: © 2023–2026 Jacky FAN — Hong Kong
+        - generic [ref=f2e106]:
+          - link "GitHub" [ref=f2e107] [cursor=pointer]:
+            - /url: https://github.com/redfrogsss
+          - link "Blog" [ref=f2e108] [cursor=pointer]:
+            - /url: https://blog.jacky.fan
+          - link "Sitemap" [ref=f2e109] [cursor=pointer]:
+            - /url: /sitemap.xml

@@ -1,0 +1,63 @@
+---
+// Port of components/content/ProseCode.vue (build-time static rendering).
+// The copy button needs one small client script; it is bound via event
+// delegation so multiple instances share a single listener. The button reads
+// the code from the sibling <pre><code> in the slot, so no extra attributes
+// are added to the output HTML.
+interface Props {
+    code?: string
+    language?: string | null
+    filename?: string | null
+    highlights?: number[]
+    meta?: string | null
+}
+
+const { filename = null } = Astro.props
+---
+
+<div class="payload-code-block">
+    <slot />
+    <button class="payload-code-block__copy" aria-label="Copy Code">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="p-1">
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            ></path>
+        </svg>
+    </button>
+</div>
+{
+    filename ? (
+        <p class="article-prose__code-filename">
+            <code>{filename}</code>
+        </p>
+    ) : null
+}
+
+<script>
+    declare global {
+        interface Window {
+            __proseCodeCopyBound?: boolean
+        }
+    }
+
+    function bindProseCodeCopy(): void {
+        if (window.__proseCodeCopyBound) return
+        window.__proseCodeCopyBound = true
+
+        document.addEventListener('click', (event) => {
+            const target = event.target instanceof Element ? event.target : null
+            const button = target?.closest('.payload-code-block__copy')
+
+            // Buttons carrying data-code belong to PayloadCodeBlock (toast flow,
+            // handled by its own script); skip them here.
+            if (!button || button.hasAttribute('data-code')) return
+
+            const code = button.closest('.payload-code-block')?.querySelector('pre code')?.textContent ?? ''
+            void navigator.clipboard.writeText(code)
+        })
+    }
+
+    bindProseCodeCopy()
+</script>

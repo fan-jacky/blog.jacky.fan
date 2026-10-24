@@ -1,0 +1,291 @@
+- generic [ref=f4e3]:
+  - link "Skip to content" [ref=f4e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f4e5]:
+    - banner [ref=f4e6]:
+      - generic [ref=f4e7]:
+        - link "Jacky FAN home" [ref=f4e8] [cursor=pointer]:
+          - /url: /
+          - text: Jacky FAN's Blog
+        - navigation "Primary" [ref=f4e10]:
+          - generic [ref=f4e11]:
+            - link "Writing" [ref=f4e12] [cursor=pointer]:
+              - /url: /
+            - link "All Articles" [ref=f4e13] [cursor=pointer]:
+              - /url: /articles
+            - link "About" [ref=f4e14] [cursor=pointer]:
+              - /url: /about
+          - button "Toggle dark mode" [ref=f4e15] [cursor=pointer]
+    - main [ref=f4e19]:
+      - generic [ref=f4e21]:
+        - link "← All articles" [ref=f4e22] [cursor=pointer]:
+          - /url: /articles
+        - article [ref=f4e23]:
+          - img "I migrated my websites into Payload CMS featured image" [ref=f4e26]
+          - generic [ref=f4e27]:
+            - generic [ref=f4e28]: CMS
+            - heading "I migrated my websites into Payload CMS" [level=1] [ref=f4e29]
+            - paragraph [ref=f4e30]: A hands‑on walkthrough of migrating two personal sites to Payload CMS, highlighting code‑first development, live preview, and how GitHub Copilot streamlined the process.
+            - generic [ref=f4e31]:
+              - generic [ref=f4e32]: June 15, 2026
+              - generic [ref=f4e33]: ·
+              - generic [ref=f4e34]: Jacky FAN
+              - generic [ref=f4e35]: ·
+              - generic [ref=f4e36]: 5 min read
+          - generic [ref=f4e37]:
+            - generic [ref=f4e38]:
+              - generic [ref=f4e39]:
+                - heading "Overview" [level=2] [ref=f4e40]
+                - paragraph [ref=f4e41]:
+                  - text: I have recently migrate two of my websites into using Payload CMS. One of it is my personal website
+                  - link "Jacky.Fan" [ref=f4e42] [cursor=pointer]:
+                    - /url: https://jacky.fan/
+                  - text: ", and the other is my"
+                  - link "blog website" [ref=f4e43] [cursor=pointer]:
+                    - /url: https://blog.jacky.fan/
+                  - text: .
+                - paragraph
+                - heading "Why Payload" [level=3] [ref=f4e44]
+                - paragraph [ref=f4e45]:
+                  - link "Payload" [ref=f4e46] [cursor=pointer]:
+                    - /url: https://payloadcms.com/
+                  - text: is an open-source, code-first headless CMS built with TypeScript and Node.js. Instead of clicking around to define content types, you describe your schema, business logic, and admin UI directly in code, which made it feel much closer to “building contents” than “configuring a CMS.”
+                - paragraph [ref=f4e47]: Because it is headless, the front end stays completely decoupled. I can keep my site in whatever framework I want, and just pull content over Payload’s REST APIs. On the data side, it runs on infrastructure I control, with MongoDB or PostgreSQL as the database.
+                - paragraph [ref=f4e48]: One feature I ended up relying on more than I expected was Live Preview. With draft or preview mode turned on, I can see unpublished edits render on the real site instantly while I write, without hitting publish. That feedback loop made migrating and iterating on the new setup noticeably faster.
+                - paragraph
+                - heading "What changed from the old setup" [level=3] [ref=f4e49]
+                - paragraph [ref=f4e50]:
+                  - text: For my personal website,
+                  - link "Jacky.Fan" [ref=f4e51] [cursor=pointer]:
+                    - /url: http://Jacky.Fan
+                  - text: ", I had been using"
+                  - link "Strapi CMS" [ref=f4e52] [cursor=pointer]:
+                    - /url: https://strapi.io/
+                  - text: since 2024. However, it was not a good experience. At the time, Strapi CMS did not have Live Preview, so I could not preview content while editing. Also, The integration I implemented was not well‑developed. In the end, I stopped using it to manage CMS content.
+                - paragraph [ref=f4e53]: For my blog website, I was using the built-in markdown rendering features in Nuxt 3. I wrote blog posts in the Notion app, then converted the content and images into Markdown. I also had to make sure all image URLs were uploaded to my GitHub repo and linked correctly. Overall, it was a complex workflow.
+                - paragraph
+                - heading "The Coding Part" [level=2] [ref=f4e54]
+                - paragraph [ref=f4e55]: In this migration, I aimed to simplify my development workflow. As a result, I chose to implement most of the code using GitHub Copilot.
+                - paragraph
+                - heading "Developing with Github Copilot" [level=3] [ref=f4e56]
+                - paragraph [ref=f4e57]:
+                  - text: At first, I used the new
+                  - link "Github Copilot Cloud Agent" [ref=f4e58] [cursor=pointer]:
+                    - /url: https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
+                  - text: for the initial coding tasks. However, I noticed that the results were not ideal, and it was difficult to fine-tune them without reading the code. So I switched to VSCode’s Github Copilot Chat for the rest of the development.
+                - paragraph
+                - figure "Developing with Github Copilot" [ref=f4e59]:
+                  - 'button "Open full size image: Developing with Github Copilot"':
+                    - img "Developing with Github Copilot"
+                - paragraph
+                - paragraph
+                - heading "CMS Scheme" [level=3] [ref=f4e61]
+                - paragraph [ref=f4e62]: My personal website originally used Strapi CMS, and it already had a well-defined schema. That made it easy for GitHub Copilot to read the schema from the code and adapt it for Payload CMS.
+                - paragraph [ref=f4e63]: For example, GitHub Copilot brought over collections, fields, and components from Strapi into Payload.
+                - figure "CMS Scheme created by Github Copilot" [ref=f4e64]:
+                  - 'button "Open full size image: CMS Scheme created by Github Copilot"':
+                    - img "CMS Scheme created by Github Copilot"
+                - paragraph
+                - figure "CMS Components created by Github Copilot" [ref=f4e66]:
+                  - 'button "Open full size image: CMS Components created by Github Copilot"':
+                    - img "CMS Components created by Github Copilot"
+                - paragraph
+                - paragraph [ref=f4e68]: For my blog website, there was no CMS logic in the original code. However, the Markdown post files had well-defined header fields. As a result, GitHub Copilot could still infer the field structure from those files and create the appropriate CMS structure for integration.
+                - figure "Original Markdown Posts Files" [ref=f4e69]:
+                  - 'button "Open full size image: Original Markdown Posts Files"':
+                    - img "Original Markdown Posts Files"
+                - paragraph
+                - figure "CMS Structure created by Github Copilot" [ref=f4e71]:
+                  - 'button "Open full size image: CMS Structure created by Github Copilot"':
+                    - img "CMS Structure created by Github Copilot"
+                - paragraph
+                - paragraph
+                - heading "Project Structure" [level=3] [ref=f4e73]
+                - paragraph [ref=f4e74]:
+                  - text: Although the two projects use different frameworks (
+                  - link "Next.js" [ref=f4e75] [cursor=pointer]:
+                    - /url: https://nextjs.org/
+                  - text: and
+                  - link "Nuxt.js" [ref=f4e76] [cursor=pointer]:
+                    - /url: https://nuxt.com/
+                  - text: ), they share the same overall structure. The framework code sits at the root, and the Payload CMS code lives in the
+                  - code [ref=f4e77]: cms
+                  - text: folder.
+                - paragraph [ref=f4e78]: The main reason for this structure is to make it easier for the coding agent to understand the codebase. By keeping both the frontend and CMS code in the same repo, the agent can search across the entire project and build better context, which helps with more complicated tasks.
+                - paragraph
+              - generic [ref=f4e80]:
+                - generic [ref=f4e81]: bash
+                - code [ref=f4e83]:
+                  - generic [ref=f4e84]: 1 ➜ jacky.fan git:(main) tree -L 1
+                  - generic [ref=f4e85]: 2 .
+                  - generic [ref=f4e86]: 3 ├── Dockerfile
+                  - generic [ref=f4e87]: 4 ├── README.md
+                  - generic [ref=f4e88]: 5 ├── app
+                  - generic [ref=f4e89]: 6 ├── cms
+                  - generic [ref=f4e90]: 7 ├── components
+                  - generic [ref=f4e91]: 8 ├── contexts
+                  - generic [ref=f4e92]: 9 ├── docker-compose.yml
+                  - generic [ref=f4e93]: 10 ├── eslint.config.mjs
+                  - generic [ref=f4e94]: 11 ├── helpers
+                  - generic [ref=f4e95]: 12 ├── hooks
+                  - generic [ref=f4e96]: 13 ├── interfaces
+                  - generic [ref=f4e97]: 14 ├── next.config.js
+                  - generic [ref=f4e98]: 15 ├── node_modules
+                  - generic [ref=f4e99]: 16 ├── open-next.config.ts
+                  - generic [ref=f4e100]: 17 ├── package.json
+                  - generic [ref=f4e101]: 18 ├── pnpm-lock.yaml
+                  - generic [ref=f4e102]: 19 ├── pnpm-workspace.yaml
+                  - generic [ref=f4e103]: 20 ├── postcss.config.js
+                  - generic [ref=f4e104]: 21 ├── providers
+                  - generic [ref=f4e105]: 22 ├── public
+                  - generic [ref=f4e106]: 23 ├── script
+                  - generic [ref=f4e107]: 24 ├── tailwind.config.ts
+                  - generic [ref=f4e108]: 25 ├── tsconfig.json
+                  - generic [ref=f4e109]: 26 └── wrangler.jsonc
+                  - generic [ref=f4e110]: "27"
+                  - generic [ref=f4e111]: 28 12 directories, 13 files
+                - button "Copy code" [ref=f4e112] [cursor=pointer]
+              - generic [ref=f4e116]:
+                - generic [ref=f4e117]: bash
+                - code [ref=f4e119]:
+                  - generic [ref=f4e120]: 1 ➜ blog.jacky.fan git:(main) ✗ tree -L 1 .
+                  - generic [ref=f4e121]: 2 .
+                  - generic [ref=f4e122]: 3 ├── Dockerfile
+                  - generic [ref=f4e123]: 4 ├── README.md
+                  - generic [ref=f4e124]: 5 ├── app.vue
+                  - generic [ref=f4e125]: 6 ├── assets
+                  - generic [ref=f4e126]: 7 ├── cms
+                  - generic [ref=f4e127]: 8 ├── components
+                  - generic [ref=f4e128]: 9 ├── content
+                  - generic [ref=f4e129]: 10 ├── deploy-instruction.md
+                  - generic [ref=f4e130]: 11 ├── docker-compose.yml
+                  - generic [ref=f4e131]: 12 ├── error.vue
+                  - generic [ref=f4e132]: 13 ├── node_modules
+                  - generic [ref=f4e133]: 14 ├── nuxt.config.ts
+                  - generic [ref=f4e134]: 15 ├── package.json
+                  - generic [ref=f4e135]: 16 ├── pages
+                  - generic [ref=f4e136]: 17 ├── plugins
+                  - generic [ref=f4e137]: 18 ├── pnpm-lock.yaml
+                  - generic [ref=f4e138]: 19 ├── pnpm-workspace.yaml
+                  - generic [ref=f4e139]: 20 ├── public
+                  - generic [ref=f4e140]: 21 ├── server
+                  - generic [ref=f4e141]: 22 ├── tailwind.config.ts
+                  - generic [ref=f4e142]: 23 ├── tsconfig.json
+                  - generic [ref=f4e143]: 24 ├── types
+                  - generic [ref=f4e144]: 25 ├── utils
+                  - generic [ref=f4e145]: 26 └── yarn.lock
+                  - generic [ref=f4e146]: "27"
+                  - generic [ref=f4e147]: 28 12 directories, 13 files
+                - button "Copy code" [ref=f4e148] [cursor=pointer]
+              - generic [ref=f4e151]:
+                - heading "Server Setup and Deploy" [level=3] [ref=f4e152]
+                - paragraph [ref=f4e153]:
+                  - text: My goal is to deploy these websites to a self-hosted
+                  - link "Raspberry Pi 5" [ref=f4e154] [cursor=pointer]:
+                    - /url: https://www.raspberrypi.com/products/raspberry-pi-5/
+                  - text: . This will reduce long-term cloud costs, such as DigitalOcean, and help me learn more about server management.
+                - paragraph [ref=f4e155]:
+                  - text: For deployment, I set everything up with
+                  - link "Docker Compose" [ref=f4e156] [cursor=pointer]:
+                    - /url: https://docs.docker.com/compose/
+                  - text: . Docker Compose lets me build and validate locally before deploying to the server, which is a huge advantage. It means I can replicate a production-like environment, iterate faster, and reduce the risk of downtime or performance issues on the live server.
+                - paragraph [ref=f4e157]:
+                  - text: After deploying the websites to my Raspberry Pi 5, I set up
+                  - link "Cloudflare Tunnel" [ref=f4e158] [cursor=pointer]:
+                    - /url: https://developers.cloudflare.com/tunnel/
+                  - text: to expose the applications to the internet and configured my DNS records in Cloudflare. I also set up
+                  - link "Access Control" [ref=f4e159] [cursor=pointer]:
+                    - /url: https://developers.cloudflare.com/cloudflare-one/access-controls/
+                  - text: from Cloudflare to restrict unauthorized access to sensitive URLs, such as
+                  - code [ref=f4e160]: /admin
+                  - text: .
+                - paragraph [ref=f4e161]: "In the end, there are a few endpoints:"
+                - list [ref=f4e162]:
+                  - listitem [ref=f4e163]:
+                    - code [ref=f4e164]: https://jacky.fan
+                    - text: → Personal Website
+                  - listitem [ref=f4e165]:
+                    - code [ref=f4e166]: https://cms.jacky.fan
+                    - text: → CMS for Personal Website
+                  - listitem [ref=f4e167]:
+                    - code [ref=f4e168]: https://blog.jacky.fan
+                    - text: → Blog Website
+                  - listitem [ref=f4e169]:
+                    - code [ref=f4e170]: https://cms-blog.jacky.fan
+                    - text: → CMS for Blog Website
+                - paragraph
+                - heading "Data Migration" [level=3] [ref=f4e171]
+                - paragraph [ref=f4e172]: For data migration, I wanted to review my content as well, so I chose to migrate manually by copying and pasting it into the CMS. It was also a good chance to review the CMS and website features and spot any bugs so I could fix them immediately.
+                - paragraph
+                - heading "Wrap-up" [level=2] [ref=f4e173]
+                - list [ref=f4e174]:
+                  - listitem [ref=f4e175]: Migrated two websites — Jacky.Fan and blog.jacky.fan — from Strapi and Nuxt Markdown to Payload CMS
+                  - listitem [ref=f4e176]: "Payload's code-first approach and Live Preview resolved the main pain points: no more blind editing or manual Markdown/image wrangling"
+                  - listitem [ref=f4e177]: GitHub Copilot accelerated development, particularly where existing schema (Strapi config or Markdown frontmatter) was available to reference
+                  - listitem [ref=f4e178]: Switched from the Cloud Agent to VSCode Copilot Chat for fine-tuning — the monorepo structure helped the agent navigate the full stack more effectively
+                  - listitem [ref=f4e179]: Docker Compose enabled full local testing before touching the live server, reducing risk of downtime
+                  - listitem [ref=f4e180]:
+                    - text: Cloudflare Tunnel and Access Control handled public exposure and restricted sensitive URLs (e.g.
+                    - code [ref=f4e181]: /admin
+                    - text: ) without relying on a cloud provider
+                  - listitem [ref=f4e182]: Manual data migration doubled as a QA pass, surfacing bugs early before launch
+                  - listitem [ref=f4e183]: "End result: a cleaner, more maintainable setup across both sites with a content editing workflow that is actually pleasant to use"
+            - generic [ref=f4e184]:
+              - generic [ref=f4e185]: Written by
+              - generic [ref=f4e186]:
+                - generic [ref=f4e187]: JF
+                - generic [ref=f4e188]:
+                  - heading "Jacky FAN" [level=2] [ref=f4e189]
+                  - paragraph [ref=f4e190]: Frontend developer based in Hong Kong. Writing about web development, dev tooling, self-hosting, and the occasional hardware experiment.
+                - generic [ref=f4e191]:
+                  - link "Portfolio" [ref=f4e192] [cursor=pointer]:
+                    - /url: https://jacky.fan
+                  - link "GitHub" [ref=f4e196] [cursor=pointer]:
+                    - /url: https://github.com/redfrogsss
+                  - link "RSS feed" [ref=f4e199] [cursor=pointer]:
+                    - /url: /rss.xml
+            - generic [ref=f4e204]:
+              - generic [ref=f4e205]:
+                - generic [ref=f4e206]: Continue Reading
+                - link "View all articles →" [ref=f4e207] [cursor=pointer]:
+                  - /url: /articles
+              - generic [ref=f4e208]:
+                - link "How to apply Google's font with NuxtJS and Tailwind featured image Frontend August 14, 2023 How to apply Google's font with NuxtJS and Tailwind" [ref=f4e209] [cursor=pointer]:
+                  - /url: /articles/how-to-apply-google-font-with-nuxtjs
+                  - img "How to apply Google's font with NuxtJS and Tailwind featured image" [ref=f4e211]
+                  - generic [ref=f4e212]:
+                    - generic [ref=f4e213]:
+                      - generic [ref=f4e214]: Frontend
+                      - generic [ref=f4e215]: August 14, 2023
+                    - heading "How to apply Google's font with NuxtJS and Tailwind" [level=3] [ref=f4e216]
+                - link "How To Setup Code Highlighting In Nuxt Content featured image Frontend June 27, 2023 How To Setup Code Highlighting In Nuxt Content" [ref=f4e217] [cursor=pointer]:
+                  - /url: /articles/how-to-setup-code-highlighting-in-nuxt-content
+                  - img "How To Setup Code Highlighting In Nuxt Content featured image" [ref=f4e219]
+                  - generic [ref=f4e220]:
+                    - generic [ref=f4e221]:
+                      - generic [ref=f4e222]: Frontend
+                      - generic [ref=f4e223]: June 27, 2023
+                    - heading "How To Setup Code Highlighting In Nuxt Content" [level=3] [ref=f4e224]
+                - link "Force Use npm, yarn or pnpm featured image Dev Tooling April 30, 2024 Force Use npm, yarn or pnpm" [ref=f4e225] [cursor=pointer]:
+                  - /url: /articles/force-use-npm-yarn-or-pnpm
+                  - img "Force Use npm, yarn or pnpm featured image" [ref=f4e227]
+                  - generic [ref=f4e228]:
+                    - generic [ref=f4e229]:
+                      - generic [ref=f4e230]: Dev Tooling
+                      - generic [ref=f4e231]: April 30, 2024
+                    - heading "Force Use npm, yarn or pnpm" [level=3] [ref=f4e232]
+        - link "Previous Article Force Use npm, yarn or pnpm" [ref=f4e234] [cursor=pointer]:
+          - /url: /articles/force-use-npm-yarn-or-pnpm
+          - generic [ref=f4e237]:
+            - generic [ref=f4e238]: Previous Article
+            - text: Force Use npm, yarn or pnpm
+    - contentinfo [ref=f4e239]:
+      - generic [ref=f4e240]:
+        - generic [ref=f4e241]: © 2023–2026 Jacky FAN — Hong Kong
+        - generic [ref=f4e242]:
+          - link "GitHub" [ref=f4e243] [cursor=pointer]:
+            - /url: https://github.com/redfrogsss
+          - link "Blog" [ref=f4e244] [cursor=pointer]:
+            - /url: https://blog.jacky.fan
+          - link "Sitemap" [ref=f4e245] [cursor=pointer]:
+            - /url: /sitemap.xml

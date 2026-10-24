@@ -1,0 +1,127 @@
+---
+// Port of components/content/PayloadCodeBlock.vue (build-time static rendering).
+// highlight.js runs in the frontmatter; the copy button + toast need one small
+// client script (delegated, bound once per page).
+import hljs from 'highlight.js/lib/common'
+
+interface Props {
+    code?: string | null
+    language?: string | null
+    showLineNumbers?: boolean | null
+}
+
+const props = Astro.props
+
+const normalizedLanguage = props.language?.trim().toLowerCase() || ''
+const source = props.code ?? ''
+
+let highlightedHtml = ''
+
+if (source) {
+    try {
+        if (normalizedLanguage && hljs.getLanguage(normalizedLanguage)) {
+            highlightedHtml = hljs.highlight(source, {
+                language: normalizedLanguage,
+                ignoreIllegals: true,
+            }).value
+        } else {
+            highlightedHtml = hljs.highlightAuto(source).value
+        }
+    } catch {
+        highlightedHtml = hljs.highlightAuto(source).value
+    }
+}
+
+const highlightedLines = highlightedHtml.split('\n')
+
+// Mirror Vue's withDefaults semantics: undefined falls back to `true`, while an
+// explicit `null` from the CMS stays falsy (line numbers hidden).
+const showLineNumbers = props.showLineNumbers === undefined ? true : props.showLineNumbers
+---
+
+<div>
+    <div class="payload-code-block">
+        {normalizedLanguage ? <div class="payload-code-block__language">{normalizedLanguage}</div> : null}
+        <pre class="payload-code-block__pre"><code class="hljs payload-code-block__code"> {
+            highlightedLines.map((line, index) => (
+                <span
+                    class="payload-code-block__line"
+                    data-line-number={showLineNumbers ? index + 1 : undefined}
+                    set:html={line || '&nbsp;'}
+                />
+            ))
+        } </code></pre>
+        <button class="payload-code-block__copy" aria-label="Copy code" type="button" data-code={source}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                ></path>
+            </svg>
+        </button>
+    </div>
+    <div class="copy-toast" hidden data-payload-code-toast>Copied to clipboard</div>
+</div>
+
+<script>
+    declare global {
+        interface Window {
+            __payloadCodeBlockCopyBound?: boolean
+        }
+    }
+
+    const pendingTimers = new WeakMap<HTMLElement, number>()
+
+    function showToast(toast: HTMLElement): void {
+        const existingTimer = pendingTimers.get(toast)
+
+        if (existingTimer !== undefined) {
+            window.clearTimeout(existingTimer)
+        }
+
+        toast.classList.remove('copy-toast-leave-active', 'copy-toast-leave-to')
+        toast.hidden = false
+        toast.classList.add('copy-toast-enter-active', 'copy-toast-enter-from')
+        void toast.offsetHeight
+        toast.classList.remove('copy-toast-enter-from')
+        window.setTimeout(() => {
+            toast.classList.remove('copy-toast-enter-active')
+        }, 200)
+
+        pendingTimers.set(
+            toast,
+            window.setTimeout(() => {
+                toast.classList.add('copy-toast-leave-active', 'copy-toast-leave-to')
+                pendingTimers.set(
+                    toast,
+                    window.setTimeout(() => {
+                        toast.hidden = true
+                        toast.classList.remove('copy-toast-leave-active', 'copy-toast-leave-to')
+                    }, 150),
+                )
+            }, 2000),
+        )
+    }
+
+    function bindPayloadCodeBlockCopy(): void {
+        if (window.__payloadCodeBlockCopyBound) return
+        window.__payloadCodeBlockCopyBound = true
+
+        document.addEventListener('click', (event) => {
+            const target = event.target instanceof Element ? event.target : null
+            const button = target?.closest('.payload-code-block__copy[data-code]')
+
+            if (!button) return
+
+            const block = button.closest('.payload-code-block')
+            const toast = block?.parentElement?.querySelector<HTMLElement>(':scope > .copy-toast')
+
+            void navigator.clipboard.writeText(button.getAttribute('data-code') ?? '')
+
+            if (toast) showToast(toast)
+        })
+    }
+
+    bindPayloadCodeBlockCopy()
+</script>

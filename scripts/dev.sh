@@ -3,7 +3,7 @@
 # scripts/dev.sh - Start the full local dev environment:
 #   1. MongoDB (Docker, port 27019)
 #   2. Payload CMS dev server (native, port 4101)
-#   3. Nuxt blog dev server (native, port 4100)
+#   3. Astro blog dev server (native, port 4100)
 #
 # Usage: ./scripts/dev.sh
 # Ctrl+C stops everything (CMS is killed, MongoDB is left running).
@@ -14,7 +14,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CMS_DIR="$ROOT_DIR/cms"
 
 # Ports (keep in sync with AGENTS.md)
-NUXT_PORT=4100
+WEB_PORT=4100
 CMS_PORT=4101
 
 # -- Helpers -------------------------------------------------------------------
@@ -57,8 +57,8 @@ command -v nc     >/dev/null 2>&1 || fail "nc (netcat) is not installed or not i
 # Docker daemon must actually be running (not just installed)
 docker info >/dev/null 2>&1 || fail "Docker daemon is not running - start Docker Desktop first"
 
-# Dependencies must be installed in both workspaces
-[ -d "$ROOT_DIR/node_modules" ] || fail "root dependencies missing - run 'pnpm install' first"
+# Dependencies must be installed in both projects
+[ -d "$ROOT_DIR/web/node_modules" ] || fail "web dependencies missing - run 'cd web && pnpm install' first"
 [ -d "$CMS_DIR/node_modules" ] || fail "cms dependencies missing - run 'cd cms && pnpm install' first"
 
 [ -f "$CMS_DIR/.env" ] || fail "cms/.env is missing - see AGENTS.md for setup"
@@ -83,7 +83,7 @@ ok "MongoDB is healthy (localhost:27019)"
 # -- 2. Payload CMS ------------------------------------------------------------
 
 CMS_PID=""
-NUXT_PID=""
+WEB_PID=""
 SHUTTING_DOWN=false
 
 # Kill a process and all of its children (npx/next spawn workers that would
@@ -105,9 +105,9 @@ cleanup() {
   SHUTTING_DOWN=true
 
   log "Shutting down..."
-  kill_tree "$NUXT_PID"
+  kill_tree "$WEB_PID"
   kill_tree "$CMS_PID"
-  wait "$NUXT_PID" "$CMS_PID" 2>/dev/null || true
+  wait "$WEB_PID" "$CMS_PID" 2>/dev/null || true
   log "Done. MongoDB is still running - 'docker compose down' to stop it."
 }
 trap cleanup EXIT INT TERM
@@ -136,14 +136,14 @@ log "Waiting for CMS to be ready..."
 wait_for_port "$CMS_PORT" "Payload CMS" 90
 ok "CMS ready -> http://localhost:$CMS_PORT/admin"
 
-# -- 3. Nuxt blog (foreground) -------------------------------------------------
+# -- 3. Astro blog (foreground) -------------------------------------------------
 
-if [ -n "$(port_pid "$NUXT_PORT")" ]; then
-  fail "Port $NUXT_PORT is already in use - stop the existing Nuxt process first (kill \$(lsof -ti :$NUXT_PORT -sTCP:LISTEN))."
+if [ -n "$(port_pid "$WEB_PORT")" ]; then
+  fail "Port $WEB_PORT is already in use - stop the existing Astro dev server first (kill \$(lsof -ti :$WEB_PORT -sTCP:LISTEN))."
 fi
 
-log "Starting Nuxt dev server on port $NUXT_PORT..."
-log "Blog will be available at http://localhost:$NUXT_PORT"
-pnpm run dev &
-NUXT_PID=$!
-wait "$NUXT_PID"
+log "Starting Astro dev server on port $WEB_PORT..."
+log "Blog will be available at http://localhost:$WEB_PORT"
+(cd "$ROOT_DIR/web" && pnpm run dev) &
+WEB_PID=$!
+wait "$WEB_PID"

@@ -1,0 +1,60 @@
+---
+// Port of components/article/Navigator.vue (build-time static rendering).
+// The optional `class` prop mirrors Vue's attribute fallthrough (the article
+// page passes class="reveal").
+import type { PayloadPostSummary } from '@/types/payload'
+import { buildArticlePath } from '@/lib/payloadPost'
+
+interface Props {
+    prev: PayloadPostSummary | null
+    next: PayloadPostSummary | null
+    class?: string | undefined
+}
+
+const { prev, next, class: className } = Astro.props
+---
+
+<div class:list={['article-nav', className]}>
+    {
+        prev ? (
+            <a href={buildArticlePath(prev.slug)} class="article-nav__item">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="article-nav__icon"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+                <span>
+                    <span class="article-nav__label">Previous Article</span>
+                    <span class="article-nav__title">{prev.title}</span>
+                </span>
+            </a>
+        ) : (
+            <div class="article-nav__spacer" />
+        )
+    }
+    {
+        next ? (
+            <a href={buildArticlePath(next.slug)} class="article-nav__item article-nav__item--next">
+                <span>
+                    <span class="article-nav__label">Next Article</span>
+                    <span class="article-nav__title">{next.title}</span>
+                </span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="article-nav__icon"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+            </a>
+        ) : null
+    }
+</div>

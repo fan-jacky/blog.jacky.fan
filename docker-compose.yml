@@ -40,10 +40,10 @@ services:
     networks:
       - blog_network
 
-  # ── Nuxt Blog ─────────────────────────────────────────────────────────────────
+  # ── Astro Blog ────────────────────────────────────────────────────────────────
   web:
     build:
-      context: .
+      context: ./web
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
@@ -51,11 +51,11 @@ services:
     env_file:
       - .env
     environment:
-      NUXT_PAYLOAD_URL: http://cms:4201
       PAYLOAD_URL: http://cms:4201
-      # Empty = proxy mode: client-side CMS calls go to same-origin /api/*,
-      # and the Nuxt server proxies to the internal CMS container (cms:4201).
-      NUXT_PUBLIC_PAYLOAD_URL: ""
+      # Empty = proxy mode: browser-side CMS calls (live preview) go to
+      # same-origin /api/*, and the Astro server proxies them to the internal
+      # CMS container (cms:4201).
+      PUBLIC_PAYLOAD_URL: ""
     ports:
       - "4200:4100"
     networks:

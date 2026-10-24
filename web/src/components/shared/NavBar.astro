@@ -1,0 +1,181 @@
+---
+// Ported from components/NavBar.vue (Nuxt → Astro).
+// Site settings are fetched at build time; the client-side refetch from the
+// Vue version (onMounted) is intentionally not ported — pages are static.
+import type { PayloadSiteSettings, SiteLink } from '@/types/payload'
+import { fetchPayloadSiteSettings } from '@/lib/payload'
+
+let settings: PayloadSiteSettings | null = null
+
+try {
+  settings = await fetchPayloadSiteSettings()
+} catch {
+  settings = null
+}
+
+// Fallback links if CMS hasn't been configured yet
+const defaultLinks: SiteLink[] = [
+  { label: 'Writing', linkType: 'internal', internalPath: '/' },
+  { label: 'All Articles', linkType: 'internal', internalPath: '/articles' },
+  { label: 'About', linkType: 'internal', internalPath: '/about' },
+]
+
+const links: SiteLink[] = settings?.navLinks?.length ? settings.navLinks : defaultLinks
+
+// Current path, normalized so directory-format URLs ("/about/") match the
+// internalPath values configured in the CMS ("/about").
+const rawPath = Astro.url.pathname
+const currentPath = rawPath !== '/' && rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath
+
+function resolveLinkHref(link: SiteLink): string {
+  if (link.linkType === 'external') {
+    return link.externalUrl ?? '#'
+  }
+  return link.internalPath ?? '/'
+}
+
+function isActiveLink(link: SiteLink): boolean {
+  if (link.linkType === 'external') {
+    return false
+  }
+  const target = link.internalPath ?? '/'
+  if (target === '/') {
+    return currentPath === '/'
+  }
+  return currentPath === target || currentPath.startsWith(`${target}/`)
+}
+---
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="site-logo" aria-label="Jacky FAN home">
+      <span class="site-logo__dot"></span>Jacky FAN's Blog
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <div class="site-nav__links">
+        {links.map((link) => (
+          link.linkType === 'internal' ? (
+            <a
+              href={resolveLinkHref(link)}
+              class:list={['site-nav__link', { 'site-nav__link--active': isActiveLink(link) }]}
+              aria-current={isActiveLink(link) ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          ) : (
+            <a
+              href={resolveLinkHref(link)}
+              class="site-nav__link"
+              target="_blank"
+              rel="noopener"
+            >
+              {link.label}
+            </a>
+          )
+        ))}
+      </div>
+      <button
+        type="button"
+        class="theme-toggle"
+        aria-label="Toggle dark mode"
+        title="Toggle dark mode (Ctrl+Shift+D)"
+      >
+        <svg class="theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="3" fill="currentColor"></circle>
+          <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M2.929 2.929l1.06 1.06m8.486 8.486l1.06 1.06M2.929 13.071l1.06-1.06m8.486-8.486l1.06-1.06" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path>
+        </svg>
+        <svg class="theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none">
+          <path d="M13.5 10.5a6 6 0 01-7.5-7.5A6 6 0 1013.5 10.5z" fill="currentColor"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="mobile-nav-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-nav-overlay"
+        aria-label="Toggle navigation menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<div
+  class="mobile-nav-overlay"
+  id="mobile-nav-overlay"
+  aria-hidden="true"
+>
+  <button
+    class="mobile-nav-overlay__close"
+    type="button"
+    aria-label="Close navigation menu"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+  <nav class="mobile-nav-overlay__nav" aria-label="Mobile navigation">
+    {links.map((link, index) => (
+      link.linkType === 'internal' ? (
+        <a
+          href={resolveLinkHref(link)}
+          class:list={['mobile-nav-overlay__link', { 'mobile-nav-overlay__link--active': isActiveLink(link) }]}
+          style={`animation-delay: ${(0.1 + index * 0.08).toFixed(2)}s`}
+          aria-current={isActiveLink(link) ? 'page' : undefined}
+        >
+          {link.label}
+        </a>
+      ) : (
+        <a
+          href={resolveLinkHref(link)}
+          class="mobile-nav-overlay__link"
+          style={`animation-delay: ${(0.1 + index * 0.08).toFixed(2)}s`}
+          target="_blank"
+          rel="noopener"
+        >
+          {link.label}
+        </a>
+      )
+    ))}
+  </nav>
+</div>
+
+<script>
+  // Header scroll state + mobile menu toggle (ported from NavBar.vue).
+  const header = document.querySelector('.site-header')
+  const toggleButton = document.querySelector<HTMLButtonElement>('.mobile-nav-toggle')
+  const overlay = document.getElementById('mobile-nav-overlay')
+  const closeButton = overlay?.querySelector<HTMLButtonElement>('.mobile-nav-overlay__close')
+
+  function syncScrolledState() {
+    header?.classList.toggle('is-scrolled', window.scrollY > 10)
+  }
+
+  function setMobileMenuOpen(open: boolean) {
+    if (!overlay || !toggleButton) {
+      return
+    }
+
+    overlay.classList.toggle('mobile-nav-overlay--open', open)
+    overlay.setAttribute('aria-hidden', open ? 'false' : 'true')
+    toggleButton.classList.toggle('mobile-nav-toggle--open', open)
+    toggleButton.setAttribute('aria-expanded', open ? 'true' : 'false')
+    document.body.style.overflow = open ? 'hidden' : ''
+  }
+
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      setMobileMenuOpen(toggleButton.getAttribute('aria-expanded') !== 'true')
+    })
+  }
+
+  closeButton?.addEventListener('click', () => {
+    setMobileMenuOpen(false)
+  })
+
+  syncScrolledState()
+  window.addEventListener('scroll', syncScrolledState, { passive: true })
+</script>

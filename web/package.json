@@ -1,0 +1,46 @@
+{
+  "name": "blog-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev -p 4100",
+    "build": "astro build",
+    "preview": "astro preview -p 4100",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.0.0",
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/vue": "^5.0.0",
+    "@payloadcms/live-preview-vue": "^3.91.0",
+    "astro": "^5.0.0",
+    "daisyui": "^3.1.1",
+    "highlight.js": "^11.12.0",
+    "isomorphic-dompurify": "^4.6.0",
+    "locomotive-scroll": "^5.0.1",
+    "vue": "^3.5.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/node": "^22.0.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "sass-embedded": "^1.100.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "~5.9.3"
+  }
+}

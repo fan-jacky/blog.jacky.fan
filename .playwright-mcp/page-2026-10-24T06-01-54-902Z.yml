@@ -1,0 +1,24 @@
+- generic [active] [ref=f14e1]:
+  - generic [ref=f14e28]:
+    - generic [ref=f14e29]:
+      - generic [ref=f14e30]:
+        - generic [ref=f14e31]:
+          - text: Email
+          - generic [ref=f14e32]: "*"
+        - textbox "Email *" [ref=f14e34]: admin@blog.local
+      - generic [ref=f14e35]:
+        - generic [ref=f14e36]:
+          - text: Password
+          - generic [ref=f14e37]: "*"
+        - textbox "Password" [ref=f14e40]: Admin123!
+    - link "Forgot password?" [ref=f14e41] [cursor=pointer]:
+      - /url: /admin/forgot
+    - button "Login" [ref=f14e43] [cursor=pointer]
+  - status [ref=f14e44]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=f14e45]:
+        - button "Close toast" [ref=f14e46] [cursor=pointer]
+        - generic [ref=f14e50]: The email or password provided is incorrect.
+  - button "Open Next.js Dev Tools" [ref=f14e7] [cursor=pointer]
+  - alert [ref=f14e11]

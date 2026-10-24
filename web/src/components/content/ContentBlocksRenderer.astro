@@ -1,0 +1,74 @@
+---
+// Port of components/content/ContentBlocksRenderer.vue (build-time static
+// rendering). CKEditor HTML is sanitized at build time with the same
+// DOMPurify allow-list as the Vue version.
+import DOMPurify from 'isomorphic-dompurify'
+import SlateRenderer from './SlateRenderer.astro'
+import PayloadCodeBlock from './PayloadCodeBlock.astro'
+import TwoColumnImage from './TwoColumnImage.astro'
+import type { PayloadContentBlock } from '@/types/payload'
+
+interface Props {
+    blocks: PayloadContentBlock[]
+}
+
+const ALLOWED_TAGS = [
+    // text & structure
+    'p', 'br', 'hr', 'span', 'div',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup', 'code', 'mark', 'small',
+    'blockquote', 'pre',
+    'ul', 'ol', 'li',
+    'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
+    'figure', 'figcaption',
+    'a', 'img',
+]
+
+function sanitizedCkHtml(html: string): string {
+    return DOMPurify.sanitize(html, {
+        ALLOWED_TAGS,
+        ALLOWED_ATTR: ['href', 'src', 'srcset', 'alt', 'title', 'target', 'rel', 'colspan', 'rowspan', 'width', 'height', 'class', 'style'],
+        FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form'],
+        KEEP_CONTENT: true,
+    })
+}
+
+const { blocks } = Astro.props
+---
+
+<div class="article-content">
+    {
+        blocks.map((block) => {
+            if (block.blockType === 'richText') {
+                return <SlateRenderer nodes={block.body ?? []} />
+            }
+
+            if (block.blockType === 'ckRichText') {
+                return <div class="article-prose ck-rich-text" set:html={sanitizedCkHtml(block.body ?? '')} />
+            }
+
+            if (block.blockType === 'codeBlock') {
+                return (
+                    <PayloadCodeBlock
+                        code={block.code}
+                        language={block.language}
+                        showLineNumbers={block.showLineNumbers}
+                    />
+                )
+            }
+
+            if (block.blockType === 'twoColumnImage') {
+                return (
+                    <TwoColumnImage
+                        leftImage={block.leftImage}
+                        leftCaption={block.leftCaption}
+                        rightImage={block.rightImage}
+                        rightCaption={block.rightCaption}
+                    />
+                )
+            }
+
+            return null
+        })
+    }
+</div>
